@@ -1,0 +1,72 @@
+POPT                                                     "Total population million"
+GDPT                                                     "Total GDP (MER) bn USD 2005 MER"
+XPRP                                                     "Real producer price/input price USD/t"
+XPRX                                                     "Real export price USD/t"
+AREA                                                     "Area harvested 1000 ha"
+ARRF                                                     "Area harvested - rainfed 1000 ha"
+ARIR                                                     "Area harvested - irrigated 1000 ha"
+LAND                                                     "Land cover 1000 ha"
+YILD                                                     "Crop yield dm t/ha, fm t/ha"
+YIRF                                                     "Crop yield - rainfed dm t/ha, fm t/ha"
+YIIR                                                     "Crop yield - irrigated dm t/ha, fm t/ha"
+YEXO                                                     "Exogenous crop yield dm t/ha, fm t/ha"
+YECC                                                     "Climate change shifter on crop yield %"
+LYLD                                                     "Livestock yield (endogenous) kg prt/ha"
+LYXO                                                     "Exogenous livestock yield trend kg prt/ha"
+FEEF                                                     "Feed conversion efficiency (endogenous) kg prt/kg prt"
+FEXO                                                     "Feed conversion efficiency trend kg prt/kg prt"
+FOOD                                                     "Food use 1000 t"
+*FOOD	"Food use USD"
+FEED                                                     "Feed use 1000 t"
+*FEED	"Feed use USD"
+OTHU                                                     "Other use 1000 t"
+*OTHU	"Other use USD"
+IMPO                                                     "Imports 1000 t"
+*IMPO	"Imports USD"
+EXPO                                                     "Exports 1000 t"
+*EXPO	"Exports USD"
+FRTN                                                     "Fertiliser N 1000 t"
+WATR                                                     "Water for irrigation km3"
+CALO                                                     "p.c. calory availability kcal/cap/d"
+CALI                                                     "p.c. calory intake kcal/cap/d"
+PROD                                                     "Production 1000 t"
+*PROD	"Production USD"
+CONS                                                     "Domestic use 1000 t"
+*CONS	"Domestic use USD"
+NETT                                                     "Net trade 1000 t"
+*NETT	"Net trade USD"
+FRUM                                                     "Feed use ruminant meat 1000 t"
+*FRUM	"Feed use ruminant meat 1000 t prt"
+FNRM                                                     "Feed use non-ruminant 1000 t"
+*FNRM	"Feed use non-ruminant 1000 t prt"
+FDRY                                                     "Feed use dairy 1000 t"
+*FDRY	"Feed use dairy 1000 t prt"
+FFSH                                                     "Feed fish sector 1000 t"
+*FFSH	"Feed fish sector 1000 t prt"
+EMIS                                                     "Total GHG emissions MtCO2e"
+ECO2                                                     "Total CO2 emissions MtCO2e"
+ECH4                                                     "Total CH4 emissions MtCO2e"
+EN2O                                                     "Total N2O emissions MtCO2e"
+CTAX                                                     "Carbon tax level USD/tCO2e"
+TPRD                                                     "Technical mitigation options - Production 1000 t"
+TGHG                                                     "Technical mitigation options - Emissions MtCO2e"
+TCO2                                                     "Technical mitigation options - CO2 MtCO2e"
+TCH4                                                     "Technical mitigation options - CH4 MtCO2e"
+TN2O                                                     "Technical mitigation options - N2O MtCO2e"
+ENEGP                                                    "Bioenergy production EJ"
+
+*IAMC
+EmisRed
+EmisRedCO2
+EmisRedCH4
+EmisRedN2O
+EmisRedRate
+EmisRedRateCO2
+EmisRedRateCH4
+EmisRedRateN2O
+RedCos
+XPRC                                                     "Real consumer price USD/t"
+BIOE
+WAST
+OtherUse
+LandCrop

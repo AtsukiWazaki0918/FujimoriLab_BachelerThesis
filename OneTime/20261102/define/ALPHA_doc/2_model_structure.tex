@@ -1,0 +1,83 @@
+% !TeX root = ../AIMALPHA_documentation.tex
+This section provides an overview of the AIM-ALPHA model. AIM-ALPHA is a recursive-dynamic partial equilibrium model 
+focusing on agricultural markets and land use, operating with an annual time step for the time horizon from 2015 to 2100.
+The model is formulated as a mixed complementarity problem (MCP) and handles approximately 200,000 variables. 
+The basic model structure is shown in Fig.~\ref{fig:model_structure}.
+
+In terms of spatial resolution, the demand side covers 166 countries globally, while the production side consists of 400 production units. 
+These production units are defined by overlaying national boundaries~\cite{worldbankWorldBankOfficial2025} with FAO's 230 major river basin boundaries~\cite{faolandandwaterdivisionMajorHydrologicalBasins2011}. 
+Figure~\ref{fig:regions} illustrates the geographical coverage of the countries and production units.
+
+Food production is categorized into 13 primary crops, 6 livestock products, 2 fishery products, and 7 processed goods. Table~\ref{tab:commodities} lists the food commodity classifications used in the model. 
+The production functions are represented by Leontief-type functions, where each good is produced by combining cropland, feed and pasture, 
+and raw materials as inputs. Other factors such as labor, capital, and energy are aggregated into a single production factor. 
+
+Primary crops and livestock products that require land are differentiated by production unit, whereas processed goods, which do not require 
+land inputs, are modeled at the level of the 166 countries. Fishery products are also modeled at the country level and are supplied by capture fisheries and aquaculture. Land use within each production unit is allocated according to a multi-nested 
+logit function that balances total land area, and land shares are determined by relative land prices. The non-pasture land nest includes
+cropland, forest, other natural land, and afforested land. Protected areas are represented as minimum areas for the corresponding land classes,
+while the agro-ecological suitability constraint limits cropland expansion.
+
+Food demand is driven by population and GDP, with income elasticity considered for future changes. Food prices are determined endogenously 
+so that supply and demand are balanced in the domestic market. Within each country, the balance between production, domestic demand, and net trade 
+(imports minus exports) is maintained. In the global market, total world imports and exports are balanced after accounting for a calibrated trade residual. 
+
+AIM-ALPHA can be linked with other AIM models. AIM-Hub provides socioeconomic, climate-policy, energy-crop, and carbon-price drivers; AFOLUB can provide land-based mitigation assumptions; and AIM-PLUM can return changes in basin-level crop yields resulting from spatial land-use allocation~\cite{fujimoriSSP3AIMImplementation2017,hasegawaNationalLandbasedClimate2025,hasegawaGlobalLanduseAllocation2017}.
+
+
+\begin{figure}[tbp]
+  \centering
+  \includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{fig2_1}
+  \caption{Overview of AIM-ALPHA}
+  \label{fig:model_structure}
+\end{figure}
+
+\begin{figure}[tbp]
+  \centering
+  \includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{fig2_2}
+  \caption{Geographical coverage of countries (166) and production units (400).}
+  \label{fig:regions}
+\end{figure}
+
+\FloatBarrier
+
+\begin{center}
+\begin{xltabular}{\linewidth}{l l l}
+  \caption{Classification of food commodities}\label{tab:commodities}\\
+    \toprule
+    \textbf{Category} & \textbf{Commodity} & \textbf{Model code} \\
+    \midrule
+    \textbf{Primary crops} & Wheat & \texttt{wht} \\
+                           & Rice & \texttt{rce} \\
+                           & Maize & \texttt{mze} \\
+                           & Other grains & \texttt{crl} \\
+                           & Starchy roots & \texttt{str} \\
+                           & Sugar crops & \texttt{sgr} \\
+                           & Legumes & \texttt{pls} \\
+                           & Nuts & \texttt{nut} \\
+                           & Oilseeds & \texttt{ocr} \\
+                           & Vegetables & \texttt{vgt} \\
+                           & Fruits & \texttt{frt} \\
+                           & Stimulants & \texttt{stm} \\
+                           & Spices & \texttt{spc} \\
+    \addlinespace[4pt]
+    \textbf{Livestock products} & Beef & \texttt{cmt} \\
+                                & Sheep and goat meat & \texttt{rmt} \\
+                                & Poultry meat & \texttt{pmt} \\
+                                & Other meat & \texttt{omt} \\
+                                & Eggs & \texttt{egg} \\
+                                & Raw milk & \texttt{mlk} \\
+    \addlinespace[4pt]
+    \textbf{Fishery products} & Fish and aquatic products & \texttt{sfd} \\
+                               & Reduction fish & \texttt{rdf} \\
+    \addlinespace[4pt]
+    \textbf{Processed products} & Sugar and sweeteners & \texttt{swt} \\
+                                & Vegetable oils & \texttt{vol} \\
+                                & Oilseed cakes & \texttt{cak} \\
+                                & Alcoholic beverages & \texttt{alc} \\
+                                & Dairy products & \texttt{dai} \\
+                                & Fishmeal & \texttt{fml} \\
+                                & Fish oil & \texttt{fol} \\
+    \bottomrule
+\end{xltabular}
+\end{center}
