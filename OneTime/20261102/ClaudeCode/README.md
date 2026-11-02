@@ -1,25 +1,58 @@
-# OneTime/20261102
+# OneTime/20261102 : 外生収量の入出力の整合性確認（11/2 版の出力と map による作物対応）
 
-2026-11-02 の作業用フォルダ。中身は作成者が用意したもの。
-このファイル内のパスはすべて `OneTime/20261102/` からの相対パス。
+2026-11-02 に、10/28 の散布図（`OneTime/20261028/` の figA・figB）を、11/2 版の AIM-Alpha 出力と作物の対応表（map）で作り直したフォルダ。
+このファイル内のパスはすべて `OneTime/20261102/` からの相対パス。AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 
-## アウトプットフォルダとの対応（2026-11-02 に確認）
+## 図とプログラムの対応
 
-- OneDrive `藤森研/卒論/アウトプット/` で 11/2 に更新されたファイルは次の2つで、どちらもこのフォルダの `define/` に同じ中身のファイルがある。重複を避けるため、新たにはコピーしていない。
+| 内容 | output | prog |
+|---|---|---|
+| 外生収量の入力と出力の比較：2020→2050 年の年平均成長率（17地域 × 5作物 × 12シナリオ） | `figA_yexo_io_growth.png` | `figA_yexo_io_growth.py` |
+| 外生収量の入力と出力の比較：2050 年の NoCC からの変化率 | `figB_yexo_io_change.png` | `figB_yexo_io_change.py` |
 
-| アウトプット内の名前 | このフォルダ内の名前 |
-|---|---|
-| `財の対応関係入力からモデルimpact_c.map` | `define/impact_c.map` |
-| `財対応関係モデルからAgMIP_c.map` | `define/AgMIP_c.map` |
+- `figA_*.py` と `figB_*.py` は中身が同じ。どちらを実行しても図2枚と表（`data/yexo_io_check.csv`・`.xlsx`）が出る。
+- 10/28 の CRP のモデル間比較（figMC）は作っていない。他の5モデルの出力がこのフォルダに無いため。
 
-- 11/2 に作った図とプログラムは、アウトプットフォルダには無い。このため `output/` と `prog/` は空で、AI の利用申告も置いていない。
+## 10/28 版からの変更点
 
-## 中身
+| 項目 | 10/28 | 11/2 |
+|---|---|---|
+| 出力の YEXO | `level.csv`（8/31 版 GDX から作成） | `data/AGMIP_all_scenario.gdx`（11/2 版）から直接読む |
+| 作物の対応 | プログラム内に手で書いた対応（J2I） | `define/impact_c.map`（IMPACT j → モデル品目）と `define/AgMIP_c.map`（モデル品目 → AgMIP 品目）を組み合わせる |
+| シナリオ数 | 10 | 12（`SSP2_500C_CS_RCP70_wO3`・`_woO3` が増えた） |
+
+- 比べ方、集計の重み（AREA tot）、国から17地域への対応、作図は 10/28 と同じ。
+- map に変えたことで、油糧作物（OSD）に `jcott`（綿）と `jplol` が新たに入った。入力側で値が変わったのは OSD だけである。
+- `AgMIP_c.map` では小麦が `WHT`、GDX の出力では `wht` なので、プログラム内で `wht` にそろえている。
+
+## 処理の流れ
+
+```
+define/ClimateShifters2.gdx（入力：CEXO, OZYEXO, AREA, iso2cty）
+define/impact_c.map, define/AgMIP_c.map（作物の対応）
+data/all_scenario_global_17.gdx（国→17地域の対応表 cty_reg_map だけを使う）
+data/AGMIP_all_scenario.gdx（出力：AGMIP_agg の YEXO, fm t/ha）
+ └─ prog/figA・figB → output/figA・figB, data/yexo_io_check.csv・.xlsx
+```
+
+## 実行方法
+
+`pip install gamspy_base "gamsapi[transfer]" pandas numpy matplotlib openpyxl` のあと、`figA_*.py` か `figB_*.py` のどちらかを実行する。どこから実行してもよい。
+
+## data・define の中身
 
 | フォルダ | ファイル | 内容 |
 |---|---|---|
-| data | `AGMIP_all_scenario.gdx`, `all_scenario_global_17.gdx`, `all_scenario_World.gdx` | AIM-Alpha の出力（11/2 版）。Interim の 8/31 版、20261028 の 10/19 版とは別のファイル |
-| data | `Xiadata.xlsx` | Xia et al. (2026) の公開データ |
-| define | `AgMIP.set`, `AgMIP_var.set`, `AgMIP_c.map`, `AgMIP_src.map`, `impact_c.map`, `impact_cty.map`, `liv_c.map` | 品目・変数・地域の対応表 |
+| data | `AGMIP_all_scenario.gdx`, `all_scenario_global_17.gdx`, `all_scenario_World.gdx` | AIM-Alpha の出力（11/2 版）。Interim の 8/31 版、20261028 の 10/19 版とは別のファイル。`all_scenario_World.gdx` は今回使っていない |
+| data | `Xiadata.xlsx` | Xia et al. (2026) の公開データ。今回は使っていない |
+| data | `yexo_io_check.csv`, `.xlsx` | 散布図の数値と、作物 × 気候 × オゾン × 緩和策ごとの相関・傾き・差の統計（figA・figB が作る） |
+| define | `AgMIP.set`, `AgMIP_var.set`, `AgMIP_src.map`, `impact_cty.map`, `liv_c.map` | 品目・変数・地域の対応表。今回は使っていない |
+| define | `impact_c.map`, `AgMIP_c.map` | 作物の対応表。今回使った。OneDrive `藤森研/卒論/アウトプット/` の `財の対応関係入力からモデルimpact_c.map`・`財対応関係モデルからAgMIP_c.map` と同じ中身 |
 | define | `ClimateShifters2.gdx` | 収量入力データ |
 | define | `ALPHA_doc/*.tex` | AIM-Alpha の説明文書 |
+
+## 確認したこと（2026-11-02）
+
+- 入力側の地域・作物で対応がとれなかったものは無かった。ただしコメ（RIC）は CAN に入力も出力も無いため 16 地域になっている（10/28 と同じ）。
+- 10/28 の表と比べ、入力側の値が変わったのは OSD だけ（map の変更による）。出力側の YEXO はほぼすべての行で変わった（GDX の版の違いによる）。
+- data・output は `.gitignore` で GitHub には上がらない。
