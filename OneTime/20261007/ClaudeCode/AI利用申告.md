@@ -5,7 +5,7 @@
 
 ## 1. 地図の作成（2026年10月7日〜8日）
 
-- **使用ツールと期間**：Claude（Anthropic）。claude.ai 上の「ClimateShifters2 yield maps」というチャットで、作成者の PC のフォルダにつないで作業した。利用モデル名は【要確認】。使用期間は 2026年10月7日から8日まで。
+- **使用ツールと期間**：Claude（Anthropic）。claude.ai 上の「ClimateShifters2 yield maps」というチャットで、作成者の PC のフォルダにつないで作業した。利用モデル名は Claude Opus 5.5。使用期間は 2026年10月7日から8日まで。
 - **使用目的と対象**：収量入力データ `収量入力ClimateShifters2.gdx` の OZYEXO から、米と小麦の外生収量の変化率を国・地域別に地図にするために使った。対象は次のとおりである。
   - 変化率を計算するプログラム（`01_calc_OZYEXO_change.py`、元 `calc.py`）と、その結果の CSV
   - 地図を描くプログラム（`map_OZYEXO_*.py`、元 `map.py`）と地図4枚

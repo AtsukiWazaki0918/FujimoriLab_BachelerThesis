@@ -39,7 +39,6 @@ define/ClimateShifters2.gdx（OZYEXO, iso2cty）
 | `define/ClimateShifters2.gdx` | 収量入力データ（元の名前は `収量入力ClimateShifters2.gdx`、10/5 更新）。`Interim/define/` のものと同じファイル | 研究室で用意 |
 | `data/ozyexo_tot_rice_wheat.csv` | 米・小麦の OZYEXO（tot）と変化率 | 01 |
 | `data/ne_50m_admin_0_countries.geojson` | Natural Earth の国境データ（1:50m）。元のフォルダには無かったので、10/7 と同じ入手先（GitHub `nvkelso/natural-earth-vector`）から取り直した | ― |
-| `data/モデル間比較用model_output/*.csv` | 10/7 にダウンロードしたモデル間比較用の各モデルの出力（AIM, ALPHA, ENVISAGE, GCAM, GLOBIOM, IMPACT）。この地図には使っていない | ― |
 
 ## 確認したこと（2026-11-02）
 
