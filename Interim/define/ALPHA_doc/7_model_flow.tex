@@ -1,0 +1,245 @@
+% !TeX root = ../AIMALPHA_documentation.tex
+\subsection{Model Calculation Flow}
+
+Figure~\ref{fig:model_flow} shows the processing flow of the AIM-ALPHA model.  
+The model begins with the processing of the original data sources, 
+including extraction of necessary information, aggregation of gridded datasets, 
+and conversion of data formats.  
+Next, the processed data are adjusted through parameter estimation via regression analysis, 
+data calibration to ensure equilibrium in the base year, 
+and coefficient calibration for model consistency.  
+
+Using these prepared data, the model then performs future scenario calculations.  
+For each year, equilibrium solutions are iteratively computed based on 
+the base-year data, the results of the previous year, and the scenario assumptions.  
+The aggregated annual results provide the final outputs for each scenario.  
+Additionally, model results are converted into the submission templates 
+of AgMIP (Agricultural Model Intercomparison and Improvement Project) 
+and IAMC (Integrated Assessment Modeling Consortium) 
+to facilitate data exchange and comparison.  
+Quantities in tonnes are reported in primary equivalent: each processed good is converted into the raw materials it was made from with its intermediate input coefficient. 
+The processing of raw materials into processed goods is therefore not reported as a use.  
+When enabled in \texttt{model\_setting.sh}, the AgMIPAssessment submodule is also executed to run vetting and variable-consistency checks, and to generate plots and summary tables.
+
+Optional pre-run bridges convert outputs from AIM-Hub, AFOLUB, and AIM-PLUM into AIM-ALPHA inputs. The switches \texttt{use\_hub\_output}, \texttt{use\_afolu\_output}, and \texttt{use\_plum\_output} control these bridges. When a scenario suffix is specified by \texttt{ModelInt}, the corresponding file in \texttt{setting/modelint} defines the linked-model setting.
+
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{fig7_1}
+    \caption{Processing flow of the AIM-ALPHA model}
+    \label{fig:model_flow}
+\end{figure}
+
+\clearpage
+
+\subsection{Programs within the Model}
+
+This section provides an overview of the major programs used in the AIM-ALPHA model.  
+Each component plays a specific role in data processing, parameter calibration, and scenario simulation.
+
+\medskip
+
+% Refined tcolorbox style for a more formal academic tone
+\newtcolorbox{programbox}[2][]{
+  enhanced,
+  sharp corners,
+  colback=Accent!3!white,          
+  colframe=Accent!70!black,        
+  boxrule=0.5pt,                   
+  left=7pt, right=7pt, top=5pt, bottom=5pt,
+  title=\texttt{#2},
+  coltitle=Primary!85!black,       
+  fonttitle=\ttfamily\bfseries\small,
+  attach boxed title to top left={xshift=0pt,yshift*=-1mm},
+  boxed title style={
+    colback=Accent!12!white,       
+    colframe=Accent!60!black,
+    boxrule=0pt,
+    sharp corners,
+    top=1pt, bottom=1pt,
+  },
+  before skip=8pt, after skip=8pt,
+  #1
+}
+
+
+\begin{programbox}{0\_csv\_to\_gdx.R}
+Converts datasets in \texttt{csv} or \texttt{xlsx} format into \texttt{gdx} format.  
+This script processes raw datasets such as FAOSTAT and MAC Curve sources.
+\end{programbox}
+
+\begin{programbox}{0\_grid\_data.R}
+Aggregates gridded datasets by country and production unit, and exports the results in \texttt{gdx} format.  
+It processes geospatial data from sources such as GAEZ, Livestock System, and LUH3.
+\end{programbox}
+
+\begin{programbox}{1\_data\_import.gms}
+Integrates and reformats the \texttt{gdx}-formatted datasets into structures compatible with the model’s computation framework.  
+It performs country code conversions, consolidates data into AIM-ALPHA’s food and land-use classifications,  
+and includes submodules that output historical data in AgMIP and IAMC template formats.
+\end{programbox}
+
+\begin{programbox}{1-5\_regression.gms}
+Performs parameter regression analyses based on the original datasets to estimate elasticities and adjustment coefficients.
+\end{programbox}
+
+\begin{programbox}{2\_baseyear.gms}
+Adjusts baseline datasets to ensure equilibrium consistency in the base year.
+\end{programbox}
+
+\begin{programbox}{3\_equilibrium.gms}
+Solves for annual equilibrium states for future years, using base-year data and previous results as inputs.
+\end{programbox}
+
+\begin{programbox}{4\_combine\_gdx.gms}
+Aggregates annual simulation outputs and compiles them into scenario-level result files.
+\end{programbox}
+
+\begin{programbox}{5\_scenario\_combine.gms}
+Combines outputs from all scenarios to produce the comprehensive simulation dataset.
+\end{programbox}
+
+\begin{programbox}{Vis\_each\_scenario.R}
+Generates graphical outputs and visualization figures from the simulation results.
+\end{programbox}
+
+\begin{programbox}{tool/AgMIPAssessment/shell/execution.sh}
+Executes the AgMIPAssessment submodule, using \texttt{AGMIP\_all\_scenario.gdx} and historical templates for vetting, variable-consistency checks, and plot/table generation.
+\end{programbox}
+
+
+\clearpage
+
+\subsection{Execution Method}
+
+The AIM-ALPHA model can be executed by running the shell script 
+\texttt{shell/ALPHA\_exe.sh} on either Cygwin or Ubuntu environments. \\
+Model configurations are defined in \texttt{shell/settings/model\_setting.sh}.  
+As summarized in Table~\ref{tab:model_setting}, the configurable items include 
+the selection of executable programs, scenario settings, and computational environment settings.
+
+\subsubsection*{Basic execution}
+
+To run the model, move to the \texttt{shell} directory and execute:
+
+\begin{lstlisting}[language=bash]
+cd shell
+bash ALPHA_exe.sh
+\end{lstlisting}
+
+When \texttt{ALPHA\_exe.sh} is called without any arguments, 
+the default configuration file \texttt{model\_setting.sh} is loaded automatically 
+and the model is executed using those settings.
+
+\subsubsection*{Using a custom setting file}
+
+It is also possible to specify an alternative setting file as an argument.  
+In this case, the configuration defined in the specified file is used instead of 
+\texttt{model\_setting.sh}:
+
+\begin{lstlisting}[language=bash]
+cd shell
+bash ALPHA_exe.sh mysetting
+\end{lstlisting}
+
+Here, \texttt{mysetting.sh} denotes a user-defined setting file 
+(e.g.\ a copy of \texttt{model\_setting.sh} with modified options).  
+Each run of \texttt{bash ALPHA\_exe.sh <setting\_file>} loads the corresponding setting file 
+and executes the model according to those configurations.
+
+
+\begin{table}[H]
+\centering
+\caption{Model configuration parameters in \texttt{model\_setting.sh}}
+\label{tab:model_setting}
+\scriptsize
+\begin{xltabular}{\textwidth}{@{} l X l @{}}
+\toprule
+\textbf{Setting item} & \textbf{Description} & \textbf{Default} \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Model switches}} \\[2pt]
+\midrule
+\texttt{data\_download} & Executes a script to download data from submodules when the repository is first cloned.  
+Once downloaded, this can be turned off. & on \\
+\texttt{data\_import} & Executes \texttt{1\_data\_import.gms} and \texttt{1-5\_regression.gms}. & on \\
+\texttt{baseyear\_run} & Executes \texttt{2\_baseyear.gms}. & on \\
+\texttt{model\_run} & Executes \texttt{3\_equilibrium.gms}. & on \\
+\texttt{combine\_gdx} & Executes \texttt{4\_combine\_gdx.gms}. & on \\
+\texttt{scenario\_combine} & Executes \texttt{5\_scenario\_combine.gms}. & on \\
+\texttt{Visualization} & Master switch for the plotting step; the \texttt{Vis\_*} switches select what is drawn. & on \\
+\texttt{AgMIP\_assessment} & Executes AgMIPAssessment vetting and variable-consistency checks, and outputs plots and tables. & off \\
+\texttt{csv2gdx\_update} & Executes \texttt{0\_csv\_to\_gdx.R}.  
+If no data update is needed, this may be turned off. & off \\
+\texttt{grid2gdx\_update} & Executes \texttt{0\_grid\_data.R}.  
+If no data update is needed, this may be turned off.  
+If executed, the required gridded input files must be placed in \texttt{data}. & off \\
+\texttt{use\_hub\_output} & Executes the Hub2ALPHA pre-run bridge. & off \\
+\texttt{use\_afolu\_output} & Executes the AFOLU2ALPHA pre-run bridge. & off \\
+\texttt{use\_plum\_output} & Executes the PLUM2ALPHA pre-run bridge. & off \\
+\texttt{backcasting\_run} & Runs the model backward from the base year to 2000. & off \\
+\texttt{history\_diagnose} & Compares the conditioned historical period with model results. & off \\
+\texttt{surplus\_run} & Calculates surplus changes relative to \texttt{surplus\_reference}. & off \\
+\texttt{report\_year\_interval} & Sets the reporting interval to one or five years. & 5 \\
+\texttt{Vis\_each\_scenario} & Generates figures for individual scenarios. & on \\
+\texttt{Vis\_scenario\_compare} & Enables comparison across scenarios in plots. & off \\
+\texttt{Vis\_scenario\_list} & Restricts scenario-comparison plots to the listed scenarios; an empty list uses all scenarios. & empty \\
+\texttt{Vis\_model\_compare} & Enables comparison across models in plots. & off \\
+\texttt{Vis\_history} & Compares simulated and historical data in plots. & off \\
+\texttt{Vis\_country}, \texttt{Vis\_global17}, \texttt{Vis\_map} & Selects country, regional, and map outputs. & on, on, off \\
+\texttt{aggregate\_global17} & Performs aggregation of results into 17-region, 10-region, and 5-region groupings. & on \\
+\texttt{AgMIP\_output} & Outputs results in AGMIP and IAMC\_Template formats. & on \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Scenario settings}} \\[2pt]
+\midrule
+\texttt{socioeconomics} & Specifies the socioeconomic scenario.  
+A file with the scenario name should exist in \texttt{setting/socioeconomic}. & SSP2 \\
+\texttt{climatepolicies} & Specifies the climate-policy scenario.  
+A file with the scenario name should exist in \texttt{setting/climatepolicy}. & BaU \\
+\texttt{climates} & Specifies the climate scenario.  
+A file with the scenario name should exist in \texttt{setting/climate}. & NoCC \\
+\texttt{runlist} & Allows direct scenario specification without using the scenario matrix.  
+Scenario names are defined as \texttt{socioeconomic|climatepolicy|climate} (e.g., \texttt{SSP2|500C\_CACN\_DAC|NoCC}).  
+If this item is specified, the three settings above are ignored. & -- \\
+\texttt{start\_year} & Starting year of simulation. & 2015 \\
+\texttt{target\_year} & Ending year of simulation. & 2100 \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Execution environment}} \\[2pt]
+\midrule
+\texttt{run\_parallel} & Runs multiple scenarios in parallel. & on \\[2pt]
+\texttt{serial\_iterations} & Ordered list of solver iteration settings tried when \texttt{run\_parallel} is \texttt{off}. & 0, 3, 5 \\[2pt]
+\texttt{MultiSol} & 
+Specifies the number of solver candidates run concurrently for each year when \texttt{run\_parallel} is \texttt{on}; the first successful solution is retained. & 3 \\[2pt]
+\texttt{ModelInt} & Optional suffix appended to scenario IDs and linked to \texttt{setting/modelint/<ModelInt>.gms}. If empty, no suffix is appended. & "" \\[2pt]
+\texttt{NCPU} & Maximum number of CPUs used for parallel computation. & 8 \\[2pt]
+\texttt{year\_timeout} &
+Maximum computation time allowed per simulation year (in seconds).
+If this time limit is exceeded, the scenario run is aborted. & 900 \\[2pt]
+\texttt{solprint} &
+Writes the full solve report into the listing files of \texttt{3\_equilibrium.gms},
+for debugging.
+Turning it off keeps the listing files small. & on \\
+\bottomrule
+\end{xltabular}
+\end{table}
+
+\clearpage
+
+\subsection{Execution Environment Requirements}
+
+The model can be executed under either Cygwin or Ubuntu with the following dependencies installed:
+
+\begin{itemize}[leftmargin=2.5em]
+  \item \textbf{Cygwin} (required packages: \texttt{zip}, \texttt{unzip})
+  \item \textbf{Ubuntu}
+  \item \textbf{R} (version $\geq$ 4.3.2; required libraries: 
+    \texttt{"tidyverse"}, \texttt{"gdxrrw"}, \texttt{"openxlsx"}, \texttt{"readxl"},
+    \texttt{"ggplot2"}, \texttt{"ggpmisc"}, \texttt{"RColorBrewer"},
+    \texttt{"purrr"}, \texttt{"furrr"}, \texttt{"scales"},
+    \texttt{"patchwork"}, \texttt{"sf"}, \texttt{"raster"}, \texttt{"ncdf4"},
+    \texttt{"exactextractr"}, \texttt{"rmapshaper"}, \\
+    \texttt{"rnaturalearth"},\texttt{"rnaturalearthdata"}, \texttt{"grDevices"})
+  \item \textbf{GAMS} (version $\geq$ 38, with the \texttt{PATH} solver available)
+  \item \textbf{GitHub}
+\end{itemize}

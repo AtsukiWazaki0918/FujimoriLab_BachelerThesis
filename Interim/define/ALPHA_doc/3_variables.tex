@@ -1,0 +1,312 @@
+% !TeX root = ../AIMALPHA_documentation.tex
+This section describes the variables and parameters used in the model.
+
+\subsection{Indices}
+Table~\ref{tab:indices} lists the indices used in the model.
+
+\begin{xltabular}{\linewidth}{l X l X}
+  \caption{List of indices}\label{tab:indices}\\
+  \toprule
+  \textbf{Index} & \textbf{Description} & \textbf{Dimension} & \textbf{Notes} \\
+  \midrule
+  \endfirsthead
+
+  \caption[]{List of indices (continued)}\\
+  \toprule
+  \textbf{Index} & \textbf{Description} & \textbf{Dimension} & \textbf{Notes} \\
+  \midrule
+  \endhead
+
+  \midrule
+  \multicolumn{4}{r}{\footnotesize Continued on next page} \\
+  \endfoot
+
+  \bottomrule
+  \endlastfoot
+
+  \texttt{cty}    & Country & 166 & \\
+  \texttt{bas}    & Production unit & 400 & Unique country--river-basin unit \\
+  \texttt{reg}    & Macro region     & 17  & Same as the regional classification in AIM-Hub~\cite{fujimoriSSP3AIMImplementation2017}. See \cref{sec:appendix_b} \\
+  \texttt{c(a)}   & Commodities (production activities) & 29 & 28 food commodities (Table~\ref{tab:commodities}) and dedicated energy crops \\
+  \texttt{a\_bas} & Basin-level production activities & 20 & Crops and livestock \\
+  \texttt{a\_cro} & Primary crops    & 14  & Including dedicated energy crops \\
+  \texttt{a\_liv} & Livestock products & 6 & \\
+  \texttt{a\_liv\_rum} & Ruminant livestock products & 3 & Cattle meat, other ruminant meat, raw milk \\
+  \texttt{a\_fsh} & Fishery products & 2 & Fish and aquatic products, reduction fish \\
+  \texttt{a\_pro} & Processed products & 7 & \\
+  \texttt{c\_trd}, \texttt{c\_ntrd} & Traded / non-traded commodities & & \\
+  \texttt{c\_fed} & Feed inputs      & 14  & \\
+  \texttt{c\_fed\_fsh} & Feed inputs from fish & 2 & Fishmeal, fish oil \\
+  \texttt{c\_int} & Intermediate inputs & 9 & \\
+  \texttt{c\_bio} & Biofuel crops    & 3   & \\
+  \texttt{wat}    & Crop production technology & 2 & Irrigated / rainfed \\
+  \texttt{cz}     & Climate zone     & 4 & Tropical, temperate, arid, hyper-arid \\
+  \texttt{sys}    & Livestock production system & 3 & Pasture-based, mixed farming, aggregate non-ruminants \\
+  \texttt{fsys}   & Fishery production system & 2 & Capture, aquaculture \\
+  \texttt{lu}     & Land-use class & 7 & \texttt{cro}, \texttt{pas}, \texttt{primf}, \texttt{secdf}, \texttt{gra}, \texttt{pastr}, \texttt{range} \\
+  \texttt{lu\_prot} & Protected land-use class & 5 & \texttt{primf}, \texttt{secdf}, \texttt{gra}, \texttt{pastr}, \texttt{range} \\
+  \texttt{lu\_pas} & Protected pasture class & 2 & \texttt{pastr}, \texttt{range} \\
+  \texttt{src}    & GHG emission sources & 14 &
+    Enteric fermentation, manure management, rice cultivation, synthetic fertilizer application, 
+    organic fertilizer application, manure on pasture, cultivation of organic soils, crop residues, 
+    crop residue burning, grassland burning, forests, natural wildfires, deforestation, afforestation \\
+  \texttt{gas}    & Gas species      & 3 & CO\textsubscript{2}, CH\textsubscript{4}, N\textsubscript{2}O \\
+  \texttt{age}    & Forest age      & 100 & 1 to 100 years \\
+\end{xltabular}
+
+
+
+
+\subsection{Endogenous Variables}
+Table~\ref{tab:endovars} lists the endogenous variables used in the model.
+
+\begin{xltabular}{\linewidth}{l X l}
+  \caption{List of endogenous variables}\label{tab:endovars}\\
+  \toprule
+  \textbf{Variable} & \textbf{Description} & \textbf{Unit} \\
+  \midrule
+  \endfirsthead
+
+  \caption[]{List of endogenous variables (continued)}\\
+  \toprule
+  \textbf{Variable} & \textbf{Description} & \textbf{Unit} \\
+  \midrule
+  \endhead
+
+  \midrule
+  \multicolumn{3}{r}{\footnotesize Continued on next page} \\
+  \endfoot
+
+  \bottomrule
+  \endlastfoot
+
+  \texttt{QD} & Domestic demand & 1000t \\
+  \texttt{QDFood} & Food consumption demand & 1000t \\
+  \texttt{QDFed} & Feed demand & 1000t \\
+  \texttt{QDInt} & Intermediate input demand for processed goods & 1000t \\
+  \texttt{QDBio} & Biofuel demand & 1000t \\
+  \texttt{QDSeed} & Seed demand & 1000t \\
+  \texttt{QDTour} & Tourist consumption demand & 1000t \\
+  \texttt{QDLoss} & Food loss amount & 1000t \\
+  \texttt{QDWaste} & Food waste amount & 1000t \\
+  \texttt{QDOth} & Other demand & 1000t \\
+  \texttt{QFeed} & Feed input & 1000t \\
+  \texttt{QInt} & Raw material input & 1000t \\
+  \texttt{QS} & Domestic production & 1000t \\
+  \texttt{QSBas} & Production by river basin & 1000t \\
+  \texttt{QSWat} & Crop production by technology & 1000t \\
+  \texttt{QSSys} & Livestock production by system & 1000t \\
+  \texttt{QSFsh} & Fishery production by system & 1000t \\
+  \texttt{FeedCoefCty} & Aquaculture feed input per unit of output & t/t \\
+  \texttt{QM} & Imports & 1000t \\
+  \texttt{QE} & Exports & 1000t \\
+  \texttt{NT} & Net trade & 1000t \\
+  \texttt{PP} & Producer price & \$/t \\
+  \texttt{PC} & Consumer price & \$/t \\
+  \texttt{PCIdx} & Subsidy-adjusted consumer price index & - \\
+  \texttt{PB} & Border-equivalent price of the domestic good & \$/t \\
+  \texttt{PM} & Import price & \$/t \\
+  \texttt{PE} & Export price & \$/t \\
+  \texttt{PW} & World price & \$/t \\
+  \texttt{QGrass} & Grass utilization & 1000t \\
+  \texttt{YLiv} & Livestock yield per hectare & t/ha \\
+  \texttt{NAnimal} & Number of livestock & 1000 head \\
+  \texttt{COBas} & Unit cost of other production inputs by basin & \$/t \\
+  \texttt{COCty} & Unit cost of other production inputs by country & \$/t \\
+  \texttt{QLVeg} & Vegetation area & 1000ha \\
+  \texttt{QLPas} & Total pasture area & 1000ha \\
+  \texttt{QLPasGrz} & Grazed pasture area & 1000ha \\
+  \texttt{QLPasUng} & Ungrazed pasture area & 1000ha \\
+  \texttt{QLNpas} & Non-pasture vegetation area & 1000ha \\
+  \texttt{QLCro} & Cropland area & 1000ha \\
+  \texttt{QLFrs} & Forest area & 1000ha \\
+  \texttt{QLPrimf} & Primary forest area & 1000ha \\
+  \texttt{QLSecdf} & Secondary forest area & 1000ha \\
+  \texttt{QLNat} & Other natural land area & 1000ha \\
+  \texttt{QLAfr} & Afforested land area & 1000ha \\
+  \texttt{QLCroCul} & Harvested cropland area & 1000ha \\
+  \texttt{QLCroFal} & Fallow cropland area & 1000ha \\
+  \texttt{QL} & Land allocated to a production activity & 1000ha \\
+  \texttt{PLPas} & Pasture land price (area-weighted average) & \$/ha \\
+  \texttt{PLPasGrz} & Grazed pasture land price & \$/ha \\
+  \texttt{PLPasUng} & Ungrazed pasture land price & \$/ha \\
+  \texttt{PLNpas} & Non-pasture land price & \$/ha \\
+  \texttt{PLCro} & Cropland price & \$/ha \\
+  \texttt{PLFrs} & Forest price & \$/ha \\
+  \texttt{PLAfr} & Afforested land price & \$/ha \\
+  \texttt{PLNat} & Other natural land price & \$/ha \\
+  \texttt{PLPrimf} & Primary forest land price & \$/ha \\
+  \texttt{PLSecdf} & Secondary forest land price & \$/ha \\
+  \texttt{PLCroCul} & Harvested cropland price & \$/ha \\
+  \texttt{PL} & Land price & \$/ha \\
+  \texttt{PLEne} & Energy crop land price & \$/ha \\
+  \texttt{GHG} & GHG emissions from agriculture sector & ktCO\textsubscript{2}-eq/yr \\
+  \texttt{GHGLU} & GHG emissions from land-use sector & ktCO\textsubscript{2}-eq/yr \\
+  \texttt{RRed} & Emission reduction rate & - \\
+  \texttt{CAbt} & Abatement cost & \$/t \\
+  \texttt{CEmis} & Unit residual-emission charge & \$/t \\
+  \texttt{MuBasMin} & Complementary variable for basin production & - \\
+  \texttt{MuFshMin} & Complementary variable for minimum aquaculture production & - \\
+  \texttt{MuImpMin} & Complementary variable for imports & - \\
+  \texttt{MuExpMax} & Complementary variable for the export limit & - \\
+  \texttt{MuNtrdMin} & Complementary variable for minimum non-traded production & - \\
+  \texttt{MuPrimfCap} & Complementary variable for primary forest expansion & - \\
+  \texttt{MuSecdfCap} & Complementary variable for secondary forest expansion & - \\
+  \texttt{MuAfrCap} & Complementary variable for the annual afforestation limit & - \\
+  \texttt{MuPrimfProt} & Complementary variable for protected primary forest & - \\
+  \texttt{MuSecdfProt} & Complementary variable for protected secondary forest & - \\
+  \texttt{MuNatProt} & Complementary variable for protected other natural land & - \\
+  \texttt{MuPasProt} & Complementary variable for protected pasture & - \\
+  \texttt{MuCroCap} & Complementary variable for the cropland constraint & - \\
+\end{xltabular}
+
+
+\subsection{Exogenous Variables}
+Table~\ref{tab:exovars} lists the exogenous variables used in the model. For data sources, see \cref{sec:data}.
+
+\begin{xltabular}{\linewidth}{l X l}
+  \caption{List of exogenous variables}\label{tab:exovars}\\
+  \toprule
+  \textbf{Variable} & \textbf{Description} & \textbf{Data Source} \\
+  \midrule
+  \endfirsthead
+
+  \caption[]{List of exogenous variables (continued)}\\
+  \toprule
+  \textbf{Variable} & \textbf{Description} & \textbf{Data Source} \\
+  \midrule
+  \endhead
+
+  \midrule
+  \multicolumn{3}{r}{\footnotesize Continued on next page} \\
+  \endfoot
+
+  \bottomrule
+  \endlastfoot
+
+  \texttt{qdFood0} & Food consumption demand in the base year & FAOSTAT \\
+  \texttt{qdBio0} & Biofuel demand in the base year & FAOSTAT \\
+  \texttt{qdSeed0} & Seed demand in the base year & FAOSTAT \\
+  \texttt{qdTour0} & Tourist consumption demand in the base year & FAOSTAT \\
+  \texttt{qdLoss0} & Food loss in the base year & FAOSTAT \\
+  \texttt{qdOth0} & Other demand in the base year & FAOSTAT \\
+  \texttt{qs0} & Domestic production in the base year & FAOSTAT \\
+  \texttt{qsBas0} & Basin production in the base year & FAOSTAT, GAEZ v4 \\
+  \texttt{qsFsh0} & Fishery production by system in the base year & FAOSTAT, FishStat \\
+  \texttt{ql0}, \texttt{pl0} & Activity land area and rent in the base year & Model calibration \\
+  \texttt{qdEne} & Demand for dedicated energy crops & AIM-Hub \\
+  \texttt{qStock} & Stock change plus the base-year statistical calibration adjustment & FAOSTAT FBS \\
+  \texttt{qRes} & Derived residual of the global international trade balance & FAOSTAT FBS \\
+  \texttt{rLoss} & Food loss rate & FAOSTAT \\
+  \texttt{rWaste} & Food waste rate & FAO (2011) \\
+  \texttt{gdpPc} & GDP per capita & SSP~3.0~\cite{crespocuaresmaIncomeProjectionsClimate2017} \\
+  \texttt{gdpPc0} & GDP per capita in the base year & World Bank \\
+  \texttt{pop} & Population & SSP~3.0~\cite{kcWittgensteinCenterWIC2024} \\
+  \texttt{pop0} & Population in the base year & World Bank \\
+  \texttt{mmj} & Market margin (zero in the current calibration) & Model assumption \\
+  \texttt{rPpSub} & Production subsidy rate & GTAP~10 \\
+  \texttt{rPpTax} & Factor employment tax rate & GTAP~10 \\
+  \texttt{rPcSub} & Net subsidy rate on household purchases & GTAP~10 \\
+  \texttt{rPcSub0} & Household purchase subsidy rate in the base year & GTAP~10 \\
+  \texttt{tm} & Import tariff rate & GTAP~10 \\
+  \texttt{mmm} & Import margin rate & GTAP~10 \\
+  \texttt{te} & Export tariff rate & GTAP~10 \\
+  \texttt{mme} & Export margin rate & GTAP~10 \\
+  \texttt{frtM}, \texttt{frtE} & Import and export freight cost & Base-year margins and world price \\
+  \texttt{yld0} & Crop yield in the base year & FAOSTAT, GAEZ~v4; H08 for energy crops \\
+  \texttt{yld} & Crop yield before the land-rent response & Model calculation \\
+  \texttt{yldTech} & Yield change factor due to technological progress & IMPACT \\
+  \texttt{yldChg} & Yield change factor due to climate change impacts & GAEZ~v4 \\
+  \texttt{yldPlum} & Optional basin-level yield adjustment from spatial crop allocation & AIM-PLUM \\
+  \texttt{croInt} & Cropping intensity & MAPSPAM \\
+  \texttt{yGrass} & Grass yield & GAEZ~v4 \\
+  \texttt{rAnimalProd} & Slaughtering / milking rate & FAOSTAT \\
+  \texttt{feedReq} & Feed requirement per unit of livestock output & Herrero et~al.~(2018) \\
+  \texttt{shrFeedConc} & Share of concentrate feed & Herrero et~al.~(2018) \\
+  \texttt{shrFeedGrain} & Composition of concentrate feed & FAOSTAT \\
+  \texttt{shrSys} & Annual livestock system share & Model calculation \\
+  \texttt{feedCoef} & Annual feed input coefficient & Model calculation \\
+  \texttt{feedCoefCty0} & Aquaculture feed input coefficient in the base year & FishStat, Naylor et~al.~(2021), FAOSTAT \\
+  \texttt{animalWt} & Livestock body weight & FAOSTAT \\
+  \texttt{nAnimalRes} & Number of non-productive livestock & FAOSTAT \\
+  \texttt{coBas0} & Unit cost of other production inputs by basin in the base year & FAOSTAT, GTAP~10 \\
+  \texttt{coCty0} & Unit cost of other production inputs by country in the base year & FAOSTAT, FishStat, GTAP~10 \\
+  \texttt{qlTot} & Total land area & LUH3 \\
+  \texttt{qlOth} & Ice/water area & LUH3 \\
+  \texttt{qlUrb} & Urban area & LUH3; optional SEDAC extension \\
+  \texttt{qlProt} & Protected land area by land-use class & LUH3, WDPA \\
+  \texttt{plFrs0} & Forest land price in the base year & LUH3, GTAP~10 \\
+  \texttt{plPrimf0} & Primary forest land price in the base year & LUH3, GTAP~10 \\
+  \texttt{plSecdf0} & Secondary forest land price in the base year & LUH3, GTAP~10 \\
+  \texttt{plNatNet} & Price of other natural land before the protection constraint & LUH3, GTAP~10 \\
+  \texttt{plPrimfCar}, \texttt{plSecdfCar} & Annualized carbon credit in forest land rent & AIM-PLUM, VISIT \\
+  \texttt{rPrimfExp}, \texttt{rSecdfExp} & Forest expansion limit rates & Model calibration \\
+  \texttt{afrPot} & Afforestation potential admitted by the model & AIM-PLUM \\
+  \texttt{plAfrRaw} & Afforested land price before the annual planting constraint & AIM-PLUM, VISIT \\
+  \texttt{plCroFal0} & Fallow land price in the base year & LUH3, GTAP~10 \\
+  \texttt{carbonStock} & Forest carbon stock by production unit & AIM-PLUM, VISIT \\
+  \texttt{carbonStockNat} & Carbon stock of other natural land by production unit & AIM-PLUM, VISIT \\
+  \texttt{carbonSeq} & Carbon sequestration by production unit and forest age & AIM-PLUM, VISIT \\
+  \texttt{ef} & GHG emission factor in agriculture sector & FAOSTAT \\
+  \texttt{efLUCro} & Land-use GHG emission factor for cropland & FAOSTAT \\
+  \texttt{efLUFrs} & Land-use GHG emission factor for forest area & FAOSTAT \\
+  \texttt{efLUPas} & Land-use GHG emission factor for pasture area & FAOSTAT \\
+  \texttt{efLUNat} & Land-use GHG emission factor for other natural land & FAOSTAT \\
+  \texttt{shrCEmis} & Share of the residual-emission charge applied & Model calculation \\
+  \texttt{pCar} & Carbon price & AIM-Hub \\
+  \texttt{mrp} & Maximum reduction potential of abatement technologies & Harmsen et~al.~(2019) \\
+\end{xltabular}
+
+
+
+
+\subsection{Parameters}
+Table~\ref{tab:params} lists the parameters used in the model.
+
+\begin{xltabular}{\linewidth}{l X X}
+  \caption{List of parameters}\label{tab:params}\\
+  \toprule
+  \textbf{Parameter} & \textbf{Description} & \textbf{Notes} \\
+  \midrule
+  \endfirsthead
+
+  \caption[]{List of parameters (continued)}\\
+  \toprule
+  \textbf{Parameter} & \textbf{Description} & \textbf{Notes} \\
+  \midrule
+  \endhead
+
+  \midrule
+  \multicolumn{3}{r}{\footnotesize Continued on next page} \\
+  \endfoot
+
+  \bottomrule
+  \endlastfoot
+
+  \texttt{elaInc} & Income elasticity of consumption in the current model year & Derived from the Food Demand Model estimates. See \cref{sec:appendix_c}. \\
+  \texttt{elaP} & Price elasticity of consumption & Estimated by regression based on Muhammad et~al.~(2011) \\
+  \texttt{intCoef} & Intermediate input coefficient & \\
+  \texttt{elaCO} & Elasticity of other production factors & \\
+  \texttt{elaYldPL} & Elasticity of crop yield to land rent & \\
+  \texttt{elaCap} & Elasticity of capture fishery production to the producer price & \\
+  \texttt{elaFeedFsh} & Elasticity of substitution between fishmeal or fish oil and oilseed cake in aquaculture feed & \\
+  $\delta$ & Coefficient parameter of the logit function & \\
+  $\rho$ & Exponent parameter of the logit function & Land-use exponents (\texttt{ela*}) follow the nested-logit structure of GCAM~\cite{calvinGCAMV51Representing2019}; production-system exponents are estimated from Herrero et~al.~(2018) \\
+  \texttt{resElaP} & Price-elasticity regression residual & \\
+  \texttt{shrWat} & Share of primary-crop production technologies & \\
+  \texttt{shrCz} & Climate zone share & \\
+  \texttt{rGrassUse} & Grass (pasture) utilization rate (base-year pasture split) & \\
+  \texttt{pInt0} & Calibrated base-year processing input price & USD/t \\
+  \texttt{pFeed0} & Base-year feed price & USD/t \\
+  \texttt{feedCostRes} & Additive feed-cost calibration residual & USD/t of livestock output \\
+  \texttt{pbRes} & Residual between the domestic-good market price and border-equivalent price & \\
+  \texttt{pmRes} & Residual between import price and world price & \\
+  \texttt{peRes} & Residual between export price and world price & \\
+  \texttt{exr} & Exchange rate & \\
+  \texttt{dcffrs} & Discount factor for forest carbon value & Introduces the discounted carbon value of forests, reflecting a 60-year forest lifetime and a 5\% interest rate. \\
+  \texttt{rFrsCarbonMax} & Maximum forest carbon credit relative to base-year rent & \\
+  \texttt{afrPlantMax} & Annual planting limit as a share of base-year non-pasture area & \\
+  \texttt{afrCost} & Afforestation cost & Cost of establishing new forest land, assumed at 250~(100~US\$/acre; 1~acre~=~0.4~ha) based on Gorte R.W. (2009). \\
+  \texttt{qlAfrAge} & Afforested area by age class & Records annual afforestation by stand age.\\
+  $\sigma$ & Elasticity of adoption of abatement technologies & Estimated by regression based on Harmsen et~al.~(2019) \\
+\end{xltabular}
