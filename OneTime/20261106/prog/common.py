@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-common.py : Xia et al. (2026) と AIM-Alpha の比較で使う共通の定義と読み込み関数。
+common.py : Xia et al. (2026) と AIM-ALPHA の比較で使う共通の定義と読み込み関数。
   figXia_prod.py と figXia_price.py から import する（単独では実行しない）。
   パスはすべてこのファイルの場所（prog/）からの相対パス。
 """
@@ -19,7 +19,7 @@ FIGD = os.path.join(ROOT, "output")
 os.makedirs(FIGD, exist_ok=True)
 
 # ---------------------------------------------------------------- シナリオ
-# Xia（各モデルの CSV）のシナリオ名 → AIM-Alpha のシナリオ名
+# Xia（各モデルの CSV）のシナリオ名 → AIM-ALPHA のシナリオ名
 SCEN_ALPHA = {
     "BAU_NoCC":         "SSP2_BaU_CS_NoCC_woO3",
     "BAU":              "SSP2_BaU_CS_RCP70_woO3",
@@ -61,14 +61,14 @@ for e, parts in EFF4_FROM_XIA.items():
         for sc, k in EFFECT[pt].items():
             EFFECT[e][sc] = EFFECT[e].get(sc, 0) + k
     EFFECT[e] = {sc: k for sc, k in EFFECT[e].items() if k != 0}
-# 参考：中間報告での AIM-Alpha の定義（シナリオの差）。図には使わず、表に残す
+# 参考：中間報告での AIM-ALPHA の定義（シナリオの差）。図には使わず、表に残す
 EFF4_INTERIM_ALPHA = {"(1)": ("SSP2_BaU_CS_RCP26_wO3", "SSP2_BaU_CS_NoCC_woO3"),
                       "(2)": ("SSP2_500C_CS_RCP26_wO3", "SSP2_BaU_CS_RCP26_wO3"),
                       "(3)": ("SSP2_500C_CS_RCP26_wO3", "SSP2_BaU_CS_NoCC_woO3"),
                       "(4)": ("SSP2_BaU_CS_RCP70_wO3", "SSP2_BaU_CS_NoCC_woO3")}
 EFF4_NOTE = ("Effects (interim report): (1) = Xia RCP2.6 Climate + RCP2.6 Ozone; (2) = Xia RCP2.6 Mitigation (BAU_MITI - BAU); "
              "(3) = (1) + (2) = OZBAU_MITI_RCP26 - BAU_NoCC; (4) = Xia RCP7.0 Climate + RCP7.0 Ozone = OZBAU - BAU_NoCC.  "
-             "Ozone effects are included in the climate effects.  AIM-Alpha uses the same combination of its matching scenarios.")
+             "Ozone effects are included in the climate effects.  AIM-ALPHA uses the same combination of its matching scenarios.")
 
 def csv_scen(model, s):
     """各モデルの CSV でのシナリオ名。Xia の主な結果のオゾンは CH4 濃度をシナリオごとに変えたもの
@@ -92,14 +92,16 @@ def region_map():
     m["reg6"] = m.xia_reg.where(m.xia_reg.isin(REG6[:-1]), "RTW")
     return dict(zip(m.iso3, m.reg6))
 
-# AIM-Alpha の品目 → AgMIP の5作物（define/AgMIP_c.map と同じ）
+# AIM-ALPHA の品目 → AgMIP の5作物（define/AgMIP_c.map と同じ）
 CROP5 = {"WHT": ["wht"], "RIC": ["rce"], "CGR": ["mze", "crl"], "OSD": ["ocr"], "SGC": ["sgr"]}
 CROP5_NAME = {"WHT": "Wheat", "RIC": "Rice", "CGR": "Coarse grains", "OSD": "Oilseeds", "SGC": "Sugar crops"}
-# AIM-Alpha の品目 → AGR（define/AgMIP_c.map の AGR。作物13品目＋畜産6品目）
+# AIM-ALPHA の品目 → CRP（define/AgMIP_c.map の CRP。作物13品目。畜産・加工品・エネルギー作物は含まない）
+CRP_ALPHA = ["rce", "wht", "mze", "crl", "ocr", "sgr", "str", "pls", "nut", "vgt", "frt", "stm", "spc"]
+# 参考：AGR（作物13品目＋畜産6品目）。価格の図では使わない
 AGR_ALPHA = ["rce", "wht", "mze", "crl", "ocr", "sgr", "str", "pls", "nut", "vgt", "frt", "stm", "spc",
              "cmt", "rmt", "omt", "pmt", "egg", "mlk"]
 
-# ---------------------------------------------------------------- AIM-Alpha の読み込み
+# ---------------------------------------------------------------- AIM-ALPHA の読み込み
 def load_alpha(symbols):
     import gamspy_base, gams.transfer as gt
     c = gt.Container(system_directory=gamspy_base.directory)
@@ -124,8 +126,8 @@ def alpha_cty_all():
 
 # ---------------------------------------------------------------- 欠損の注記
 def missing_note(cty_with_data, label, regions=None):
-    """Xia の区分にあるが AIM-Alpha にデータが無い国（データ無し）と、
-    AIM-Alpha にあるが Xia の区分に無い国（区分無し）を、地域ごとの文字列にする。"""
+    """Xia の区分にあるが AIM-ALPHA にデータが無い国（データ無し）と、
+    AIM-ALPHA にあるが Xia の区分に無い国（区分無し）を、地域ごとの文字列にする。"""
     rm = region_map()
     allc = alpha_cty_all()
     no_data = {}
@@ -134,14 +136,14 @@ def missing_note(cty_with_data, label, regions=None):
             no_data.setdefault(r, []).append(iso if iso in allc else iso + "*")
     regs = regions or REG6
     star = any(v.endswith("*") for vs in no_data.values() for v in vs)
-    lines = [f"No data in AIM-Alpha for {label} (countries in Xia et al. SI Table 4 that are in the AIM-Alpha "
-             "country list but have no records" + ("; * = code not in the AIM-Alpha country list" if star else "") + "):"]
+    lines = [f"No data in AIM-ALPHA for {label} (countries in Xia et al. SI Table 4 that are in the AIM-ALPHA "
+             "country list but have no records" + ("; * = code not in the AIM-ALPHA country list" if star else "") + "):"]
     for r in regs:
         if r in no_data:
             lines.append(f"  {r}: " + ", ".join(sorted(no_data[r])))
     extra = sorted(allc - set(rm))
     extra_d = sorted(set(extra) & set(cty_with_data))
-    lines.append("Not classified in Xia et al. (AIM-Alpha codes absent from SI Table 4): "
+    lines.append("Not classified in Xia et al. (AIM-ALPHA codes absent from SI Table 4): "
                  + ", ".join(extra) + ("; none of them have data." if not extra_d
                                         else "; with data: " + ", ".join(extra_d)))
     import textwrap

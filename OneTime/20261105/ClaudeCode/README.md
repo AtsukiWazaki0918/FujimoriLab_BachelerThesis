@@ -1,6 +1,6 @@
-# OneTime/20261105 : Xia et al. (2026) と AIM-Alpha の比較の方針決め
+# OneTime/20261105 : Xia et al. (2026) と AIM-ALPHA の比較の方針決め
 
-2026-11-05 に、Xia et al. (2026) の公開データ（`data/Xiadata.xlsx`）と AIM-Alpha の出力（`data/all_scenario_World.gdx`）を比べる図の方針を決めたフォルダ。
+2026-11-05 に、Xia et al. (2026) の公開データ（`data/Xiadata.xlsx`）と AIM-ALPHA の出力（`data/all_scenario_World.gdx`）を比べる図の方針を決めたフォルダ。
 この日は図を作っていないので、prog と output は空である。図は `OneTime/20261106/` で作った。
 AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 
@@ -9,12 +9,12 @@ AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 | フォルダ | ファイル | 内容 |
 |---|---|---|
 | data | `Xiadata.xlsx` | Xia et al. (2026) の公開データ。`OneTime/20261104/data/` のものと同じファイル |
-| data | `all_scenario_World.gdx` | AIM-Alpha の国別の出力。`OneTime/20261104/data/` のものと同じファイル |
+| data | `all_scenario_World.gdx` | AIM-ALPHA の国別の出力。`OneTime/20261104/data/` のものと同じファイル |
 | doc | `43016_2026_1322_MOESM1_ESM.pdf` | Xia et al. (2026) の Supplementary Information（作成者が置いた） |
 
 ## 1. Xia et al. (2026) とデータの概要（本文と SI で確認したこと）
 
-- 論文：Xia et al., *Nature Food* 7, 356–368 (2026)。6つの農業経済モデル（AIM-Hub, ENVISAGE, GCAM, GLOBIOM, IMPACT, MAGNET）で、気候変動・緩和策・オゾン濃度変化が食料安全保障に与える影響を比べている。Excel の「AIM」は AIM-Hub であり、AIM-Alpha ではない。
+- 論文：Xia et al., *Nature Food* 7, 356–368 (2026)。6つの農業経済モデル（AIM-Hub, ENVISAGE, GCAM, GLOBIOM, IMPACT, MAGNET）で、気候変動・緩和策・オゾン濃度変化が食料安全保障に与える影響を比べている。Excel の「AIM」は AIM-Hub であり、AIM-ALPHA ではない。
 - 社会経済シナリオは SSP2（感度分析だけ SSP1 も）。
 
 ### シナリオ（本文 Table 1）と効果（SI Table 1）
@@ -56,9 +56,9 @@ AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 
 - 6地域は AgMIP の地域を SSA, CHN, IND, SEA, OAS とそれ以外（RTW）にまとめたもの（SI Table 3）。日本と台湾は SEA。国の割り当ては SI Table 4。
 
-## 2. 比べる指標と AIM-Alpha の変数の対応（決定事項）
+## 2. 比べる指標と AIM-ALPHA の変数の対応（決定事項）
 
-| Xia の指標 | AIM-Alpha の変数 | 処理 |
+| Xia の指標 | AIM-ALPHA の変数 | 処理 |
 |---|---|---|
 | Crop prod change：PROD | `qs_load` [1000 t] | 5作物にまとめ、6地域に足す |
 | Crop prod change：CALO | `calPc_load` [kcal/人/年] | 365 で割り、5作物にまとめ、人口加重で6地域の平均 |
@@ -68,7 +68,7 @@ AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 - Xia の price は生産者価格（XPRP）である。根拠：CSV の XPRP AGR と一致した（AIM, IMPACT）、本文に「agricultural commodity producer prices」とある。
 
 ### シナリオの対応
-| Xia | AIM-Alpha |
+| Xia | AIM-ALPHA |
 |---|---|
 | BAU_NoCC | `SSP2_BaU_CS_NoCC_woO3` |
 | BAU | `SSP2_BaU_CS_RCP70_woO3` |
@@ -77,11 +77,11 @@ AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 | BAU_MITI_RCP26 | `SSP2_500C_CS_RCP26_woO3` |
 | OZBAU_MITI_RCP26 | `SSP2_500C_CS_RCP26_wO3` |
 
-- AIM-Alpha の `500C` と AIM-Hub の炭素予算 500 GtCO2 は同じ設定（作成者が確認）。
-- AIM-Alpha の wO3 は、Xia の `_W_CH4` と同じオゾンのデータとして扱う（作成者の判断）。
+- AIM-ALPHA の `500C` と AIM-Hub の炭素予算 500 GtCO2 は同じ設定（作成者が確認）。
+- AIM-ALPHA の wO3 は、Xia の `_W_CH4` と同じオゾンのデータとして扱う（作成者の判断）。
 
 ### 作物の対応（`define/AgMIP_c.map`）
-| Xia | AIM-Alpha：生産量 | AIM-Alpha：カロリー |
+| Xia | AIM-ALPHA：生産量 | AIM-ALPHA：カロリー |
 |---|---|---|
 | WHT | wht | wht |
 | RIC | rce | rce |
@@ -90,14 +90,14 @@ AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 | SGC | sgr | **sgr＋swt（甘味料）** |
 | AGR（価格） | 作物13品目＋畜産6品目 | — |
 
-- カロリーで vol と swt を足す根拠：各モデルの CSV の CALO（世界、BAU_NoCC、2020年）は OSD が 253–428 kcal、SGC が 166–247 kcal。AIM-Alpha の ocr だけでは 59 kcal、sgr だけでは 4.5 kcal で、vol と swt を足すと 351 kcal と 245 kcal になる。GLOBIOM だけは OSD が 44 kcal で、加工品を含まないとみられる（SGC は値なし）。品目の定義の文書（von Lampe et al. 2014 の Table SI-4）は手元に無い。
+- カロリーで vol と swt を足す根拠：各モデルの CSV の CALO（世界、BAU_NoCC、2020年）は OSD が 253–428 kcal、SGC が 166–247 kcal。AIM-ALPHA の ocr だけでは 59 kcal、sgr だけでは 4.5 kcal で、vol と swt を足すと 351 kcal と 245 kcal になる。GLOBIOM だけは OSD が 44 kcal で、加工品を含まないとみられる（SGC は値なし）。品目の定義の文書（von Lampe et al. 2014 の Table SI-4）は手元に無い。
 
 ### 地域の対応
-- Xia SI Table 4 の国の割り当てに合わせる（MNG は AIM-Alpha では SEA だが OAS に移す）。
-- AIM-Alpha にデータが無い国は、図の注釈にすべて書く。「データ無し」と「区分無し」を分けて書く。
+- Xia SI Table 4 の国の割り当てに合わせる（MNG は AIM-ALPHA では SEA だが OAS に移す）。
+- AIM-ALPHA にデータが無い国は、図の注釈にすべて書く。「データ無し」と「区分無し」を分けて書く。
 
 ### 単位と時点
-- AIM-Alpha は 2015–2050 の5年おき（基準年 2015）。Xia は 2020–2050。どちらも 2020 と 2050 がある。
+- AIM-ALPHA は 2015–2050 の5年おき（基準年 2015）。Xia は 2020–2050。どちらも 2020 と 2050 がある。
 
 ## 3. 計算方法の決定事項
 
@@ -105,7 +105,7 @@ AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 - 方法A（重みを固定）：P(s,t) = Σ p(s,t) × Q0 ÷ Σ Q0。Q0 は基準シナリオ・基準年の生産量。
 - 方法B（その時の生産量で重み付け）：P(s,t) = Σ p(s,t) × Q(s,t) ÷ Σ Q(s,t)。
 - 各モデルの CSV の XPRP AGR WLD は方法B で作られていた（AIM-Hub, IMPACT, GLOBIOM は一致、ENVISAGE は 1–2% ずれ）。
-- **決定：** 純粋な価格の変化を比べるため、Xia 側も AIM-Alpha 側も方法A で計算する（作成者の指示）。
+- **決定：** 純粋な価格の変化を比べるため、Xia 側も AIM-ALPHA 側も方法A で計算する（作成者の指示）。
 
 ### カロリーの FAO 補正
 - Xia の補正：CALO_fao(t) = FAO(2020) × CALO_モデル(t) ÷ CALO_モデル(2020)。FAO の値は6モデル共通（世界 2,957.4 kcal）。
