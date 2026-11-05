@@ -40,6 +40,36 @@ EFFECT = {
     ("RCP2.6", "Combined"):   {"OZBAU_MITI_RCP26": 1, "BAU_NoCC": -1},
 }
 
+# 中間報告の4つの効果（Interim/ClaudeCode/README.md）を、Xia の効果の組み合わせで表したもの。
+#   中間報告ではオゾンの影響を気候の影響に含める。
+#   (1) 気候変動影響 SSP2-2.6 = Xia の RCP2.6 Climate + RCP2.6 Ozone
+#   (2) 緩和策影響   SSP2-2.6 = Xia の RCP2.6 Mitigation
+#   (3) 総合影響     SSP2-2.6 = (1) + (2) = OZBAU_MITI_RCP26 − BAU_NoCC
+#   (4) 気候変動影響 SSP2-7.0 = Xia の RCP7.0 Climate + RCP7.0 Ozone = OZBAU − BAU_NoCC
+EFF4 = ["(1)", "(2)", "(3)", "(4)"]
+EFF4_LABEL = {"(1)": "(1) Climate change\n(SSP2-2.6)", "(2)": "(2) Mitigation\n(SSP2-2.6)",
+              "(3)": "(3) Combined effect\n(SSP2-2.6)", "(4)": "(4) Climate change\n(SSP2-7.0)"}
+EFF4_LINE = ("(1) Climate change (SSP2-2.6)   (2) Mitigation (SSP2-2.6)   "
+             "(3) Combined effect (SSP2-2.6)   (4) Climate change (SSP2-7.0)")
+EFF4_FROM_XIA = {"(1)": [("RCP2.6", "Climate"), ("RCP2.6", "Ozone")],
+                 "(2)": [("RCP2.6", "Mitigation")],
+                 "(3)": [("RCP2.6", "Climate"), ("RCP2.6", "Mitigation"), ("RCP2.6", "Ozone")],
+                 "(4)": [("RCP7.0", "Climate"), ("RCP7.0", "Ozone")]}
+EFFECT.update({e: {} for e in EFF4})
+for e, parts in EFF4_FROM_XIA.items():
+    for pt in parts:
+        for sc, k in EFFECT[pt].items():
+            EFFECT[e][sc] = EFFECT[e].get(sc, 0) + k
+    EFFECT[e] = {sc: k for sc, k in EFFECT[e].items() if k != 0}
+# 参考：中間報告での AIM-Alpha の定義（シナリオの差）。図には使わず、表に残す
+EFF4_INTERIM_ALPHA = {"(1)": ("SSP2_BaU_CS_RCP26_wO3", "SSP2_BaU_CS_NoCC_woO3"),
+                      "(2)": ("SSP2_500C_CS_RCP26_wO3", "SSP2_BaU_CS_RCP26_wO3"),
+                      "(3)": ("SSP2_500C_CS_RCP26_wO3", "SSP2_BaU_CS_NoCC_woO3"),
+                      "(4)": ("SSP2_BaU_CS_RCP70_wO3", "SSP2_BaU_CS_NoCC_woO3")}
+EFF4_NOTE = ("Effects (interim report): (1) = Xia RCP2.6 Climate + RCP2.6 Ozone; (2) = Xia RCP2.6 Mitigation (BAU_MITI - BAU); "
+             "(3) = (1) + (2) = OZBAU_MITI_RCP26 - BAU_NoCC; (4) = Xia RCP7.0 Climate + RCP7.0 Ozone = OZBAU - BAU_NoCC.  "
+             "Ozone effects are included in the climate effects.  AIM-Alpha uses the same combination of its matching scenarios.")
+
 def csv_scen(model, s):
     """各モデルの CSV でのシナリオ名。Xia の主な結果のオゾンは CH4 濃度をシナリオごとに変えたもの
     （_W_CH4）。GLOBIOM には _W_CH4 が無く、ENVISAGE は小文字の _w_CH4（2026-11-04 の照合で確認）。"""
@@ -130,3 +160,18 @@ def wrap_notes(lines, width=190):
         ind = "      " if ln.startswith("  ") else "  "
         out += textwrap.wrap(ln, width=width, subsequent_indent=ind, break_on_hyphens=False) or [ln]
     return "\n".join(out)
+
+
+def save_fig(fig, name, dpi=600):
+    """メモリ上で PNG にしてから書き込む。接続先のフォルダでは、上書き時に "w+b" で開くと失敗することがあるため。"""
+    import io, time
+    import matplotlib.pyplot as plt
+    buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=dpi); plt.close(fig)
+    for k in range(10):
+        try:
+            with open(os.path.join(FIGD, name), "wb") as f:
+                f.write(buf.getvalue())
+            return
+        except OSError:
+            time.sleep(2)
+    raise OSError("保存できませんでした: " + name)
