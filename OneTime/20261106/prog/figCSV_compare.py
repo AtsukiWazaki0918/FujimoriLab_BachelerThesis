@@ -219,36 +219,27 @@ MISS_TEXT = ("† Countries not simulated in AIM-ALPHA (no data after 2015; excl
              "share of the regional population in 2015):  "
              + "  |  ".join(miss_line(r) for r in BASE13 if r in DAGGER)
              + f";  World {miss.loc['WLD', 'share_pop2015']:.1f}%.  NAM, OAM, AME and SAS include the countries of their member regions.")
+# 図の注釈：計算方法と元の指標名は処理の流れの図（doc/flow_figCSV_compare.drawio）に書いたので、
+# ここには例外の扱い（欠損・中央値から外したもの・単位や年の違い）だけを書く。
 COMMON_NOTES = [
-    "Effects (scenario differences in 2050): (1) RCP26 - Baseline; (2) RCP26_MITI - RCP26; (3) RCP26_MITI - Baseline; (4) RCP70 - Baseline.  "
-    "Other models: Baseline = BAU_NoCC, RCP26 = OZBAU_RCP26, RCP26_MITI = OZBAU_MITI_RCP26, RCP70 = OZBAU (ozone with fixed CH4 concentrations, "
-    "as in AIM-ALPHA; Xia et al.'s main results use scenario-specific CH4 concentrations, _W_CH4).  "
-    "AIM-ALPHA: SSP2_BaU_CS_NoCC_woO3, SSP2_BaU_CS_RCP26_wO3, SSP2_500C_CS_RCP26_wO3, SSP2_BaU_CS_RCP70_wO3.  Ozone effects are included in the climate effects.",
-    "Bars: median of AIM-Hub, ENVISAGE, GCAM and IMPACT (AIM-ALPHA and GLOBIOM excluded); for EUR, MEN and AME, GCAM is also excluded from the median.  "
-    "GLOBIOM (hollow symbol) is shown for reference only: its output files contain only ozone scenarios with scenario-specific CH4 concentrations, "
-    "so its effects (especially (4)) are not consistent with the other models.  "
-    "Source: AgMIP-format model output files (*.csv) and all_scenario_World.gdx (AIM-ALPHA).  AIM-Hub = 'AIM' in the model output files.",
-    "CRP = WHT + RIC + CGR + OSD + SGC + VFN + OCR (primary crops; livestock, processed products, energy crops, fibre crops and other items excluded).  "
-    "AIM-Hub has no VFN (included in its OCR).  AIM-ALPHA: 13 crops (CRP in define/AgMIP_c.map), aggregated by cty_reg_map.",
+    "GLOBIOM (hollow symbol) is not included in the median: its output files contain only ozone scenarios with scenario-specific CH4 concentrations "
+    "(the other models and AIM-ALPHA: fixed CH4 concentrations).",
+    "GCAM is excluded from the median for EUR, MEN and AME: Turkey is included in EUR instead of MEN in GCAM (inferred from its population by region).  "
+    "Regional definitions may differ slightly among models.",
+    "AIM-Hub has no VFN; it is included in its OCR.",
     MISS_TEXT,
     "Taiwan is not included in AIM-ALPHA (no population and GDP projections).",
-    "GCAM: Turkey is included in EUR instead of MEN (inferred from its population by region).  Regional definitions may differ slightly among models (e.g., GCAM: EUR/MEN).",
 ]
 VAR_NOTES = {
-    "PROD": ["Calorie basis: E [PJ] = Q [1000 t] x f [kcal/t] x 1000 x 4184 [J/kcal] x 1e-15; f = sum cal_load / sum qdFood_load x 1000 (AIM-ALPHA, BaU_NoCC_woO3, 2020, world), "
-             "the same f for all models and regions: " + ", ".join(f"{k} {KF[k]:,.0f}" for k in ["WHT", "RIC", "CGR", "OSD", "SGC", "VFN", "OCR"])
-             + f"; AIM-Hub OCR (incl. VFN) {KF['OCR_AIM']:,.0f}.  Q = PROD (AIM-ALPHA: qs_load).  GLOBIOM in fresh weight."],
-    "CONS": ["Calorie basis: as for PROD, with Q = CONS (domestic use: food, feed and other uses; AIM-ALPHA: qd_load).  f: "
-             + ", ".join(f"{k} {KF[k]:,.0f}" for k in ["WHT", "RIC", "CGR", "OSD", "SGC", "VFN", "OCR"]) + f"; AIM-Hub OCR {KF['OCR_AIM']:,.0f} kcal/t.  GLOBIOM in fresh weight."],
-    "XPRP": ["Value = (P_target,2050 - P_reference,2050) / P_Baseline,2020 x 100.  Crop and regional prices: XPRP in each model output file (AIM-ALPHA: pp_load weighted by qs_load of the same year over countries).  "
-             "CRP: crop prices weighted by production (t) of the same scenario and year.  ENVISAGE prices are indices (2014 = 1) and its base year is 2021.  "
-             "GCAM: VFN from its sub-items (FRU, LEG, NUT, RTB, VEG)."],
+    "PROD": [],
+    "CONS": [],
+    "XPRP": ["ENVISAGE: prices are indices (2014 = 1), and its base year is 2021 instead of 2020.  "
+             "Points are missing where there is no production (e.g., rice in CAN)."],
 }
-YLAB = {"PROD": "Production of {i}: change in 2050 (PJ)",
-        "CONS": "Domestic use of {i}: change in 2050 (PJ)",
-        "XPRP": "Producer price of {i}: change in 2050\n(% of the Baseline price in 2020)"}
-TITLE = {"PROD": "Production [PROD], calorie basis (PJ)", "CONS": "Domestic use [CONS], calorie basis (PJ)",
-         "XPRP": "Producer price [XPRP] index (Baseline in 2020 = 100)"}
+YLAB = {"PROD": "Change in 2050 (PJ)",
+        "CONS": "Change in 2050 (PJ)",
+        "XPRP": "Change in 2050\n(% of the 2020 Baseline price)"}
+TITLE = {"PROD": "Production", "CONS": "Domestic use", "XPRP": "Producer price"}
 
 # ---------------------------------------------------------------- 図
 fams = {f.name for f in font_manager.fontManager.ttflist}
@@ -303,18 +294,18 @@ def legend(fig, y):
                fontsize=6, handletextpad=0.2, columnspacing=0.7)
 
 for var in ["PROD", "CONS", "XPRP"]:
-    notes = COMMON_NOTES[:3] + VAR_NOTES[var] + COMMON_NOTES[3:]
+    notes = VAR_NOTES[var] + COMMON_NOTES
     # 世界
     fig, axs = plt.subplots(2, 3, figsize=(16 * CM, 15 * CM))
     for ax, item in zip(axs.flat, ["CRP"] + ITEMS5):
         panel(ax, res[(res.VAR == var) & (res.ITEM == item) & (res.Region == "WLD")], "WLD")
         ax.set_title(NAME[item], fontsize=7, pad=2)
-        ax.set_ylabel(YLAB[var].format(i=item), fontsize=6)
-    fig.text(0.5, 0.995, f"{TITLE[var]}.  Region: World.", ha="center", va="top", fontsize=7)
+        ax.set_ylabel(YLAB[var], fontsize=6)
+    fig.text(0.5, 0.995, f"{TITLE[var]}: World", ha="center", va="top", fontsize=8)
     legend(fig, 0.975)
     fig.text(0.5, 0.94, EFF_LINE, ha="center", va="top", fontsize=6.5)
     fig.text(0.01, 0.005, wrap(notes, 185), ha="left", va="bottom", fontsize=4.6)
-    fig.tight_layout(rect=(0, 0.24, 1, 0.925), h_pad=0.8, w_pad=0.6)
+    fig.tight_layout(rect=(0, 0.16, 1, 0.925), h_pad=0.8, w_pad=0.6)
     save(fig, f"figCSV_{var}_world.png")
     # 17 地域
     for item in ["CRP"] + ITEMS5:
@@ -326,13 +317,13 @@ for var in ["PROD", "CONS", "XPRP"]:
             panel(ax, res[(res.VAR == var) & (res.ITEM == item) & (res.Region == r)], r, small=True)
             ax.set_title(r + (" †" if r in DAGGER else ""), fontsize=6.5, pad=2)
             if i % 6 == 0:
-                ax.set_ylabel(YLAB[var].format(i=item), fontsize=5.5)
-        fig.text(0.5, 0.995, f"{TITLE[var]}.  Item: {NAME[item]}.  Region: AgMIP 17 regions.",
-                 ha="center", va="top", fontsize=7)
+                ax.set_ylabel(YLAB[var], fontsize=5.5)
+        fig.text(0.5, 0.995, f"{TITLE[var]} of {NAME[item].lower() if item != 'CRP' else 'crops (CRP)'}: AgMIP 17 regions",
+                 ha="center", va="top", fontsize=8)
         legend(fig, 0.975)
         fig.text(0.5, 0.94, EFF_LINE, ha="center", va="top", fontsize=6.5)
         fig.text(0.01, 0.005, wrap(notes, 185), ha="left", va="bottom", fontsize=4.6)
-        fig.tight_layout(rect=(0, 0.22, 1, 0.925), h_pad=0.6, w_pad=0.3)
+        fig.tight_layout(rect=(0, 0.12, 1, 0.925), h_pad=0.6, w_pad=0.3)
         save(fig, f"figCSV_{var}_{item}_region.png")
 print("font:", FONT, "| dagger:", DAGGER)
 print(miss[["share_pop2015", "named", "n_small"]].to_string())

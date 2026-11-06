@@ -96,6 +96,10 @@ f [kcal/t] = Σ cal_load [million kcal] ÷ Σ qdFood_load [1000 t] × 1000
 
 ## 5. 図の注釈に書いたこと（欠損と地域の定義）
 
+- 計算方法・元の指標名・シナリオ名は、処理の流れの図（`doc/flow_figCSV_compare.drawio`）にまとめたので、図の注釈からは削除した（2026-11-06）。図の注釈には、次の例外の扱いだけを残した：GLOBIOM を中央値から外したこと、EUR・MEN・AME で GCAM を中央値から外したこと（トルコ）、AIM-Hub に VFN が無いこと、AIM-ALPHA の欠損（†）、台湾、ENVISAGE の価格が指数で基準年が2021年であること、生産の無い組の点が無いこと。
+- 図のタイトルは「指標：地域」（例：Production: World、Production of crops (CRP): AgMIP 17 regions）にした。単位は縦軸に書いた。
+
+
 - **† AIM-ALPHA で計算されていない国**：人口などが2015年までしか無く、生産量・消費量・価格の値が無い国。AIM-ALPHA の地域の合計から抜けている。他の5モデルの地域の人口は、これらの国を含めた人口とほぼ同じで、欠けているのは AIM-ALPHA だけである。地域の人口（2015年）に占める割合は次のとおり（`data/missing_cty.csv`）。
 
 | 地域 | 割合 | 国 |
