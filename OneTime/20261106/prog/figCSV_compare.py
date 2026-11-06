@@ -41,9 +41,10 @@ os.makedirs(FIGD, exist_ok=True)
 XIA = ["AIM", "ENVISAGE", "GCAM", "GLOBIOM", "IMPACT"]
 MODELS = XIA + ["AIM-ALPHA"]
 LABEL = {"AIM": "AIM-Hub"}
-# シナリオ（オゾンは CH4 濃度をシナリオごとに変えたもの。RCP26 の _W_CH4 は AIM-Hub にしか無いので全モデル CH4 なし）
+# シナリオ。オゾンは _W_CH4 なし（CH4 濃度をシナリオで変えていないもの）を使う。
+# AIM-ALPHA の wO3 の外生収量へのオゾンの影響が、_W_CH4 なしのシナリオと一致したため（2026-11-06 に確認）。
 SC = {"Baseline": "BAU_NoCC", "RCP26": "OZBAU_RCP26",
-      "RCP26_MITI": "OZBAU_MITI_RCP26_W_CH4", "RCP70": "OZBAU_W_CH4"}
+      "RCP26_MITI": "OZBAU_MITI_RCP26", "RCP70": "OZBAU"}
 def scen(m, k):
     s = SC[k]
     if m == "GLOBIOM":
@@ -217,14 +218,15 @@ MISS_TEXT = ("† Countries not simulated in AIM-ALPHA (no data after 2015; excl
              + f";  World {miss.loc['WLD', 'share_pop2015']:.1f}%.  NAM, OAM, AME and SAS include the countries of their member regions.")
 COMMON_NOTES = [
     "Effects (scenario differences in 2050): (1) RCP26 - Baseline; (2) RCP26_MITI - RCP26; (3) RCP26_MITI - Baseline; (4) RCP70 - Baseline.  "
-    "Other models: Baseline = BAU_NoCC, RCP26 = OZBAU_RCP26, RCP26_MITI = OZBAU_MITI_RCP26_W_CH4, RCP70 = OZBAU_W_CH4 (GLOBIOM: without _W_CH4).  "
+    "Other models: Baseline = BAU_NoCC, RCP26 = OZBAU_RCP26, RCP26_MITI = OZBAU_MITI_RCP26, RCP70 = OZBAU (ozone without scenario-specific CH4 concentrations, "
+    "as in AIM-ALPHA; Xia et al.'s main results use the _W_CH4 scenarios).  "
     "AIM-ALPHA: SSP2_BaU_CS_NoCC_woO3, SSP2_BaU_CS_RCP26_wO3, SSP2_500C_CS_RCP26_wO3, SSP2_BaU_CS_RCP70_wO3.  Ozone effects are included in the climate effects.",
     "Bars: median of the five other models (AIM-Hub, ENVISAGE, GCAM, GLOBIOM, IMPACT), excluding AIM-ALPHA; for EUR, MEN and AME, GCAM is also excluded from the median.  "
     "Source: AgMIP-format model output files (*.csv) and all_scenario_World.gdx (AIM-ALPHA).  AIM-Hub = 'AIM' in the model output files.",
     "CRP = WHT + RIC + CGR + OSD + SGC + VFN + OCR (primary crops; livestock, processed products, energy crops, fibre crops and other items excluded).  "
     "AIM-Hub has no VFN (included in its OCR).  AIM-ALPHA: 13 crops (CRP in define/AgMIP_c.map), aggregated by cty_reg_map.",
     MISS_TEXT,
-    "Taiwan has no separate data in AIM-ALPHA; its production is included in CHN (IMPACT region CHM = mainland China + Taiwan).",
+    "Taiwan is not included in AIM-ALPHA (no population and GDP projections); the other models include it in SEA.",
     "GCAM: Turkey is included in EUR instead of MEN (inferred from its population by region).  Regional definitions may differ slightly among models (e.g., GCAM: EUR/MEN).",
 ]
 VAR_NOTES = {
