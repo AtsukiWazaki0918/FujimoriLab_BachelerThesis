@@ -47,3 +47,12 @@
 
 - 記録：このフォルダ（`OneTime/20261104/ClaudeCode/`）の `README.md` と本ファイル。
 - 保存先：GitHub リポジトリ https://github.com/AtsukiWazaki0918/FujimoriLab_BachelerThesis.git の `OneTime/20261104/` に保存する。`.gitignore` により data と output は除外されるため、リポジトリに入るのは prog・define・ClaudeCode である。data と output は作成者の PC のローカルフォルダ `C:\FujimoriLab_BachelerThesis\OneTime\20261104\` にある。最終的には研究室サーバー上での長期保存先、閲覧範囲、保存期間は作成者が確定し、最終版の申告に追記する。
+
+## 3. 処理の流れの図（2026年11月6日）
+
+- **使用ツール**：1. と同じ（Claude、claude-opus-5-5）。使用日は 2026年11月6日。
+- **対象**：`doc/flow_figC_yexo_io_cty.drawio`（figC の処理の流れの図）。
+- **作成者が指示した内容**：figC の流れの図を、figA・figB・figCSV の流れの図と同じ形式で作ること。
+- **AI が決めた内容**（作成者の確認の対象）：ステップの区切り方、箱の配置、文言。内容はプログラム（`prog/figC_yexo_io_cty.py`）と出力の表に照らして書いた。
+- **AI が行った検証**：正しい XML であることと、箱の中の文字が収まることを、同じ大きさで描いて確かめた。
+- **本人による確認状況**：作成者が draw.io で開いて確認・修正する予定である。

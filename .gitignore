@@ -3,3 +3,7 @@ output/
 output*/
 data*/
 plot/
+# editor / python junk
+__pycache__/
+*.pyc
+*.bkp

@@ -54,6 +54,10 @@ data/all_scenario_World.gdx（出力：yldWat_load）
  └─ prog/figC_yexo_io_cty.py → output/figC_yexo_io_cty_<品目>.png, data/yexo_io_cty.csv, data/yexo_io_cty_check.csv
 ```
 
+## 処理の流れの図（draw.io、2026-11-06 に追加）
+
+`doc/flow_figC_yexo_io_cty.drawio`：figC ができるまでの全ステップを、入力側（ClimateShifters2 から直接）と出力側（AIM-ALPHA の出力）の2本の流れで示した。各ステップ（単位換算か集計を1回）の後の単位・品目・地域と、使った式・対応表を書いた。draw.io（diagrams.net）で開いて編集できる。プログラムは変えていない。
+
 ## 実行方法
 
 `pip install gamspy_base "gamsapi[transfer]" pandas numpy matplotlib` のあと `figC_yexo_io_cty.py` を実行する。どこから実行してもよい。
