@@ -25,6 +25,17 @@
 - map に変えたことで、油糧作物（OSD）に `jcott`（綿）と `jplol` が新たに入った。入力側で値が変わったのは OSD だけである。
 - `AgMIP_c.map` では小麦が `WHT`、GDX の出力では `wht` なので、プログラム内で `wht` にそろえている。
 
+## 処理の流れの図（draw.io、2026-11-06 に追加）
+
+`doc/flow_figA_figB_yexo_io.drawio`：figA・figB ができるまでの全ステップを、入力側（ClimateShifters2 から直接）と出力側（AIM-ALPHA の出力）の2本の流れで示した。各ステップ（単位換算か集計を1回）の後の単位・品目・地域と、使った式・対応表のファイルを書いた。draw.io（diagrams.net）で開いて編集できる。
+
+| 対応表のファイル（2026-11-06 に追加） | 内容 |
+|---|---|
+| `define/j2agmip5.csv` | IMPACT の品目 j → モデルの品目 c → AgMIP の5作物（impact_c.map と AgMIP_c.map を組み合わせた結果。22行） |
+| `define/cty2reg_input.csv` | 入力の CTY → AIM-ALPHA の17地域（iso2cty と cty_reg_map から作った対応と、プログラムで指定した7つ。157行） |
+
+- 2つのファイルは、プログラム（figA・figB）の中で作っている対応表を、確認のために書き出したもの。プログラムは変えていない。
+
 ## 処理の流れ
 
 ```

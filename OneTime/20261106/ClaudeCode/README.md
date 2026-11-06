@@ -114,6 +114,16 @@ f [kcal/t] = Σ cal_load [million kcal] ÷ Σ qdFood_load [1000 t] × 1000
 - **GCAM のトルコ**：GCAM の EUR と MEN の人口の差がトルコの人口とほぼ同じ（2015年：EUR +71、MEN −79、トルコ 78 百万人。2050年：+89、−95、96）なので、GCAM ではトルコが MEN ではなく EUR に入っていると判断した。CSV からトルコの分を取り出して直すことはできないので、EUR・MEN・AME のパネルでは GCAM を中央値の計算から外し、そのことを注釈に書いた。
 - 地域の定義はモデルによって少し違う可能性がある、と注釈に1行書いた。
 
+## 処理の流れの図（draw.io）
+
+`doc/flow_figCSV_compare.drawio`：生産量・消費量・生産者価格の図ができるまでの全ステップを、AIM-ALPHA と他のモデル（CSV）の2本の流れで示した（タブが3つ）。各ステップ（単位換算か集計を1回）の後の単位・品目・地域と、使った式・対応表のファイルを書いた。draw.io（diagrams.net）で開いて編集できる。
+
+| 対応表・係数のファイル | 内容 |
+|---|---|
+| `define/AgMIP_c.map` | AIM-ALPHA の品目 → AgMIP の品目 |
+| `define/cty_reg_map_AgMIP17.csv` | 国 → AgMIP 17地域＋World（all_scenario_World.gdx の cty_reg_map を書き出したもの） |
+| `define/kcal_factor.csv` | カロリー換算係数 f（data/kcal_factor.csv と同じ） |
+
 ## 処理の流れ
 
 ```
