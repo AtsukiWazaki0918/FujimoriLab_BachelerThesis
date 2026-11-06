@@ -1,141 +1,157 @@
-# OneTime/20261106 : Xia et al. (2026) と AIM-ALPHA の比較（生産量・価格、中間報告の4つの効果）
+# OneTime/20261106 : AgMIP の各モデルの出力（CSV）と AIM-ALPHA の比較（卒論の4つの効果）
 
-2026-11-06 に、Xia et al. (2026) のモデルと AIM-ALPHA について、中間報告の4つの効果（2050年）を比べる図を作ったフォルダ。
-指標・シナリオ・作物・地域の対応と、計算方法を決めた経緯は `OneTime/20261105/ClaudeCode/README.md` にある。
-カロリー摂取量の図は、Xia 側の FAO 補正の方法が不透明なため、今回は作っていない。
+2026-11-06 に、AgMIP 形式の5モデルの出力（CSV）と AIM-ALPHA について、卒論（中間報告）の4つの効果（2050年）を比べる図を作ったフォルダ。
+Xia et al. (2026) の Excel（`Xiadata.xlsx`）は使っていない。Excel を使って作った最初の版は `others/excel_version/` に移した（経緯は下の「版の履歴」）。
 このファイル内のパスはすべて `OneTime/20261106/` からの相対パス。AI の利用申告は同じフォルダの `AI利用申告.md` を参照。
 
 ## 図とプログラムの対応
 
 | 内容 | output | prog |
 |---|---|---|
-| 作物の生産量の変化（カロリーベース、PJ、6地域）。作物ごとに1枚 | `figXia_prod_<作物>.png`（WHT, RIC, CGR, OSD, SGC の5枚） | `figXia_prod.py` |
-| 5作物の合計の生産量の変化（カロリーベース、PJ、6地域） | `figXia_prod_TOTAL.png` | `figXia_prod.py` |
-| 作物全体（CRP。畜産・加工品を除く）の世界の生産者価格の変化 | `figXia_price_world.png` | `figXia_price.py` |
+| 世界の効果。パネルは CRP と5作物（WHT, RIC, CGR, OSD, SGC） | `figCSV_<VAR>_world.png`（VAR = PROD, CONS, XPRP の3枚） | `figCSV_compare.py` |
+| AgMIP 17地域の効果。品目ごとに1枚 | `figCSV_<VAR>_<ITEM>_region.png`（VAR 3つ × ITEM = CRP, WHT, RIC, CGR, OSD, SGC の18枚） | `figCSV_compare.py` |
 
-- `prog/common.py` は2つのプログラムが共通で使う定義（シナリオ・効果・地域・品目の対応、読み込み、欠損の注記、保存）。単独では実行しない。
-- どの図も、灰色の棒は **AIM-ALPHA 以外のモデル（Xia et al. のモデル）の中央値**、記号は各モデルの値。図の凡例と注記にも書いた。
+- 1つのプログラムで21枚の図と表3つが出る。実行時間は約1分。
+- どの図も、灰色の棒は **AIM-ALPHA 以外の5モデルの中央値**、記号は各モデルの値。EUR・MEN・AME では GCAM も中央値から外した（下の 5.）。
 
-## 1. 中間報告の4つの効果
+## 1. 比べるモデルとデータ
 
-中間報告（`Interim/ClaudeCode/README.md`）の4つの効果を、Xia の効果（SI Table 1 の Climate・Mitigation・Ozone）を足し合わせて作った。中間報告ではオゾンの影響を気候の影響に含めるため、Ozone を Climate に足している。
-
-| 効果 | Xia の効果の組み合わせ | シナリオの式（Xia の名前） |
-|---|---|---|
-| (1) 気候変動影響（SSP2-2.6） | RCP2.6 Climate ＋ RCP2.6 Ozone | OZBAU_MITI_RCP26 − BAU_MITI ＋ BAU − BAU_NoCC |
-| (2) 緩和策影響（SSP2-2.6） | RCP2.6 Mitigation | BAU_MITI − BAU |
-| (3) 総合影響（SSP2-2.6） | (1) ＋ (2) | OZBAU_MITI_RCP26 − BAU_NoCC |
-| (4) 気候変動影響（SSP2-7.0） | RCP7.0 Climate ＋ RCP7.0 Ozone | OZBAU − BAU_NoCC |
-
-- AIM-ALPHA も、対応するシナリオ（`common.py` の `SCEN_ALPHA`）で同じ式を使った。
-- **中間報告の定義との違い：** 中間報告では、(1) を BaU_RCP26_wO3 − BaU_NoCC_woO3、(2) を 500C_RCP26_wO3 − BaU_RCP26_wO3 としていた。この定義を Xia 側で使うには「緩和なし・RCP2.6 の気候・オゾンあり（CH4 濃度もシナリオごと）」のシナリオが必要だが、各モデルの CSV では AIM-Hub にしか無い（`OZBAU_RCP26_W_CH4`）。そのため、全モデルで計算できる上の式を使った。
-  - (3) と (4) は、中間報告の定義と同じになる。
-  - (1) と (2) は、緩和策と気候の相互作用をどちらに含めるかが違う。AIM-ALPHA での差は、表の `*_interim_def` の列に残した。例：価格の (2) は、上の式で +2.0%、中間報告の定義で +1.6%。
-
-## 2. 生産量の図（figXia_prod）
-
-| 項目 | Xia et al. | AIM-ALPHA |
-|---|---|---|
-| 値の出どころ | `Xiadata.xlsx` のシート Crop prod change in 2050（PROD [1000 t]）。GLOBIOM だけは Excel が乾物重量なので、CSV の生重量（1000 t）から同じ式で計算した | `qs_load`（Domestic production [1000 t]）を国から6地域に足した |
-| モデル | AIM-Hub, ENVISAGE, GCAM, GLOBIOM, IMPACT, MAGNET | — |
-| 作物 | WHT, RIC, CGR, OSD, SGC | wht, rce, mze＋crl, ocr, sgr |
-| 地域 | 6地域 | Xia SI Table 4 の国の割り当て（`define/xia_region_map.csv`）で集計 |
-
-### カロリーベースへの換算式
-```
-E [PJ] = ΔPROD [1000 t] × 1000 [t / 1000 t] × f [kcal/t] × 4184 [J/kcal] × 10^-15 [PJ/J]
-       = ΔPROD [1000 t] × f [kcal/t] × 4.184 × 10^-9
-
-f [kcal/t] = Σ_国 cal_load [million kcal] ÷ Σ_国 qdFood_load [1000 t] × 1000
-             （AIM-ALPHA、SSP2_BaU_CS_NoCC_woO3、2020年、世界。CGR は mze と crl をまとめる）
-```
-
-| 作物 | f [kcal/t] |
+| | 内容 |
 |---|---|
-| WHT | 3,337,709 |
-| RIC | 2,586,437 |
-| CGR | 3,188,297 |
-| OSD | 2,857,911 |
-| SGC | 361,818 |
+| 他のモデル | AIM-Hub（CSV の「AIM」）, ENVISAGE, GCAM, GLOBIOM, IMPACT。`data/モデル間比較用model_output/*.csv`（10/7 にダウンロードしたもの。`OneTime/20261028/data/` と同じファイル） |
+| AIM-ALPHA | `data/all_scenario_World.gdx`（国別の出力） |
+| MAGNET | CSV が無いので入っていない |
 
-- 同じ f を全モデル・全地域に使うので、換算の違いによるモデル間の差は生じない。
-- f は作物ごとに違う値である。CGR だけは、Xia の CGR がトウモロコシとその他穀物を分けていないので、mze と crl をまとめて1つの値にした。
-- f は AIM-ALPHA の食料需要（人が食べる分）の値から作ったもので、国ごとの値を世界で合計した平均である。中間報告の図5.2（AGMIP_agg の million kcal）は国ごとの係数を使っているので、AIM-ALPHA の値はその図と少し違う。
-- 合計（TOTAL）は、5作物の PJ を足したもの。
+## 2. 卒論の4つの効果とシナリオ
+
+| 効果 | 式 |
+|---|---|
+| (1) 気候変動影響（SSP2-2.6） | RCP26 − Baseline |
+| (2) 緩和策影響（SSP2-2.6） | RCP26_MITI − RCP26 |
+| (3) 総合影響（SSP2-2.6） | RCP26_MITI − Baseline |
+| (4) 気候変動影響（SSP2-7.0） | RCP70 − Baseline |
+
+| 卒論のシナリオ | 他のモデル（CSV） | AIM-ALPHA |
+|---|---|---|
+| Baseline | BAU_NoCC | SSP2_BaU_CS_NoCC_woO3 |
+| RCP26 | OZBAU_RCP26 | SSP2_BaU_CS_RCP26_wO3 |
+| RCP26_MITI | OZBAU_MITI_RCP26_W_CH4 | SSP2_500C_CS_RCP26_wO3 |
+| RCP70 | OZBAU_W_CH4 | SSP2_BaU_CS_RCP70_wO3 |
+
+- オゾンの影響は気候の影響に含める（卒論の設計）。
+- **`_W_CH4`**：オゾン濃度を、シナリオごとの CH4（メタン）濃度で計算したもの（Xia et al. 本文 Methods）。Xia の主な結果はこちら。
+  - **AIM-ALPHA の wO3 は CH4 濃度を変えていると判断して**、RCP26_MITI と RCP70 は `_W_CH4` を使った（作成者の判断。確認中）。
+  - RCP26（緩和なし・RCP2.6）の `_W_CH4` は AIM-Hub にしか無いので、全モデルで CH4 なしの OZBAU_RCP26 を使った。RCP2.6 では CH4 の有無による差は小さい（作物全体の世界の生産量へのオゾン効果で 0.02–0.17 ポイント）。
+  - GLOBIOM には `_W_CH4` が無いので、すべて CH4 なし。ENVISAGE は小文字の `_w_CH4`。
+  - 作成者の確認の結果、AIM-ALPHA が CH4 濃度を変えていなかった場合は作り直す。
+
+## 3. 指標
+
+### 生産量（PROD）と消費量（CONS）：カロリーベース [PJ]
+```
+E [PJ] = Q [1000 t] × f [kcal/t] × 1000 [t / 1000 t] × 4184 [J/kcal] × 10^-15 [PJ/J]
+
+f [kcal/t] = Σ cal_load [million kcal] ÷ Σ qdFood_load [1000 t] × 1000
+   （AIM-ALPHA、SSP2_BaU_CS_NoCC_woO3、2020年、世界。cal_load と qdFood_load の両方に値がある国×品目の組で合計）
+```
+
+| AgMIP の品目 | AIM-ALPHA の品目 | f [kcal/t] |
+|---|---|---|
+| WHT | wht | 3,337,709 |
+| RIC | rce | 2,586,437 |
+| CGR | mze, crl | 3,188,297 |
+| OSD | ocr | 2,857,911 |
+| SGC | sgr | 361,818 |
+| VFN | str, pls, nut, vgt, frt | 613,293 |
+| OCR | stm, spc | 1,340,465 |
+| AIM-Hub の OCR（VFN を含む） | str, pls, nut, vgt, frt, stm, spc | 626,094 |
+
+- 同じ品目には、全モデル・全地域で同じ f を使う。換算の違いによるモデル間の差は生じない。
+- Q：他のモデルは CSV の PROD・CONS（GLOBIOM は生重量）、AIM-ALPHA は `qs_load`（生産量）・`qd_load`（国内需要の合計）。
+- CONS は国内利用の合計（食料・飼料・その他）。
 - 換算係数は `data/kcal_factor.csv` に保存した。
 
-### 確認したこと
-- GLOBIOM の CSV（乾物重量）から計算した Xia の効果は、5地域で Excel と一致した（差は 1e-11 以下）。RTW は一致しない（Xia の RTW の作り方が不明。11/4 と同じ）。図の GLOBIOM の RTW は WLD − 5地域で計算している。
+### 生産者価格（XPRP）：価格指数の効果 [%]
+```
+値 = (P_対象シナリオ,2050 − P_参照シナリオ,2050) ÷ P_Baseline,2020 × 100
+```
+- 作物別・地域別の価格は、各モデルの CSV の XPRP をそのまま使う。
+- CRP の価格は、作物別の価格を、**同じシナリオ・同じ年の生産量（重量、t）**で重み付けして平均する（Xia・AgMIP の CSV と同じ重み付け）。
+- AIM-ALPHA は、国 × 品目の `pp_load` を、同じシナリオ・同じ年の `qs_load` で重み付けして、品目・地域にまとめる。
+- ENVISAGE の価格は品目ごとの指数（2014 = 1）で、CSV に2020年が無いので、基準年は2021年。
+- 確認：自分で作った CRP の価格を CSV の XPRP CRP（世界、Baseline、基準年）と比べた。AIM-Hub は一致した（0.498345 と 0.498342）。IMPACT は、CRP に含まれる繊維作物などを除いた分だけ違う。
 
-## 3. 価格の図（figXia_price）
+## 4. 作物と地域
 
-純粋な価格の変化を比べるため、Xia 側も AIM-ALPHA 側も、**重みを基準年の生産量に固定した方法（方法A）**で計算した。
+- **CRP**：WHT＋RIC＋CGR＋OSD＋SGC＋VFN＋OCR。一次産品の作物だけで、畜産・加工品・エネルギー作物（ECP）・繊維作物（PFB）・その他（OAP, OFD）は含まない。AIM-Hub には VFN が無い（OCR に含まれる）。GCAM の VFN の価格は内訳（FRU, LEG, NUT, RTB, VEG）から作る。AIM-ALPHA は作物13品目（`define/AgMIP_c.map` の CRP）。
+- **作物別**：WHT, RIC, CGR, OSD, SGC。
+- **地域**：世界と AgMIP の17地域（CAN, USA, BRA, OSA, FSU, EUR, MEN, SSA, CHN, IND, SEA, OAS, ANZ, NAM, OAM, AME, SAS）。AIM-ALPHA は `cty_reg_map` で国を集計した。
+- 生産の無い組（例：カナダのコメ）は、価格の値が無いので描かれない。
 
-- P(s, t) = Σ p(s, t) × Q0 ÷ Σ Q0
-- Q0：基準シナリオ（BAU_NoCC）・基準年の生産量
-- 値 = 1. の式で P(s, 2050) を組み合わせた効果 ÷ P(BAU_NoCC, 基準年) × 100 [%]
+## 5. 図の注釈に書いたこと（欠損と地域の定義）
 
-| 項目 | Xia et al. の各モデル | AIM-ALPHA |
+- **† AIM-ALPHA で計算されていない国**：人口などが2015年までしか無く、生産量・消費量・価格の値が無い国。AIM-ALPHA の地域の合計から抜けている。他の5モデルの地域の人口は、これらの国を含めた人口とほぼ同じで、欠けているのは AIM-ALPHA だけである。地域の人口（2015年）に占める割合は次のとおり（`data/missing_cty.csv`）。
+
+| 地域 | 割合 | 国 |
 |---|---|---|
-| 値の出どころ | `data/モデル間比較用model_output/*.csv` の XPRP と PROD | `pp_load`（Producer price [USD/t]）と `qs_load` [1000 t] |
-| 足し合わせる単位 | AgMIP の13地域 × 品目 | 国 × 品目 |
-| 品目 | AIM-Hub：WHT, RIC, CGR, OSD, SGC, OCR（VFN は OCR に含まれる）／ENVISAGE, GLOBIOM, IMPACT：これに VFN を加えた7品目／GCAM：VFN の内訳（FRU, LEG, NUT, RTB, VEG）を使う | 作物13品目（`define/AgMIP_c.map` の CRP） |
-| 基準年 | 2020年（ENVISAGE は CSV に 2020年が無いので 2021年） | 2020年 |
-| モデル | AIM-Hub, ENVISAGE, GCAM, GLOBIOM, IMPACT（MAGNET は CSV が無いので図に無い） | — |
+| OSA | 11.0% | CUB, PRI, VEN と小さな地域2つ、人口データの無い7つ（BMU, CYM, DMA, GRL, KNA, TCA, VGB） |
+| MEN | 9.3% | SYR, YEM、人口データの無い PSE |
+| SEA | 3.7% | PRK, SGP |
+| SSA | 3.1% | CPV, ERI, GNQ, MUS, SOM, SSD と小さな地域1つ、人口データの無い F206 |
+| OAS | 0.5% | 小さな地域9つ、人口データの無い6つ |
+| EUR, FSU | 0.0% | 人口データの無い小さな国のみ |
+| 世界 | 2.1% | — |
 
-- 13地域 × 品目の生産量の合計は、どのモデルも WLD の生産量と一致した（`data/xia_price_weights_info.csv`）。
-- ENVISAGE の価格は品目ごとの指数（2014 = 1）なので、まとめた値は指数の生産量加重平均になる。
-- **畜産と加工品を除いた（作成者の指示）。** 除いた品目：畜産（RUM, NRM, DRY）、エネルギー作物（ECP）、繊維作物（PFB）、その他（OAP, OFD）。AgMIP の品目はどれも一次産品で、植物油や砂糖などの加工品は品目として入っていない。AIM-ALPHA 側も、加工品（vol, swt など）とエネルギー作物（ecr）を含まない作物13品目にした。
-- Xia の Excel には AGR（作物＋畜産）の価格しか無いので、作物だけの値は CSV から計算した。Excel とは比べられない。
-- **品目の範囲の確認：** 選んだ品目を、その時の生産量で重み付けして平均した値（`method_B_own`）を、CSV の XPRP CRP WLD（`method_B_csv`）と比べた。
-  - AIM-Hub：全件一致。品目の範囲が CRP と同じことを確認した。
-  - IMPACT：差は 0.1 ポイント以内。CRP に入っている繊維作物などを除いた分の差。
-  - GLOBIOM：差は 1.6 ポイント以内。
-  - ENVISAGE：価格が指数のため、差が出る（0.6 ポイント以内）。
-  - GCAM：CSV に CRP の価格が無いので比べられない。CRP の生産量には、エネルギー作物と繊維作物が入っている。
-
-## 4. 図の注釈に書いた欠損
-
-- **データ無し**：Xia SI Table 4 の国のうち、AIM-ALPHA の国リスト（`cty`）にはあるが、`qs_load`・`pp_load` に値が無い国（60か国・地域）。地域ごとに書いた。
-  - SEA：BRN, PRK, SGP, TWN
-  - OAS：BTN, COK, FSM, KIR, MDV, MHL, NCL, NIU, NRU, PLW, PYF, TKL, TON, TUV, WSM
-  - SSA：CPV, ERI, GNQ, MUS, REU, SOM, SYC
-  - RTW：ABW, AIA, AND, ANT, BHR, BMU, CUB, CYM, DMA, ESH, FLK, GGY, GIB, GLP, GRL, GUF, IMN, JEY, KNA, LIE, MCO, MSR, PRI, PSE, QAT, SJM, SMR, SYR, TCA, VAT, VEN, VGB, VIR, YEM
-- **区分無し**：AIM-ALPHA の国リストにあるが、Xia SI Table 4 に無いコード（76, ALA, ASM, SSD など）。どれもデータが無いので結果に影響しない。
-- Xia SI Table 4 の国で、AIM-ALPHA の国リストに無いものは無かった。
+  - 集計地域（OAM, AME, SAS）は、メンバーの地域の欠損を含む。17地域の図では、該当する地域のパネルのタイトルに † を付けた。
+  - BHR, QAT, BTN は、計算されているが農地と生産が無い国なので、欠損として扱っていない。作物ごとの値が無い組も、生産が無いとみなした。
+- **台湾**：AIM-ALPHA に台湾の値は無い。台湾の生産は CHN に含まれる（IMPACT の地域 CHM = 中国本土＋台湾。`impact_cty.map` で CHM → CHN）。この点は作成者が確認中で、違った場合は作り直す。
+- **GCAM のトルコ**：GCAM の EUR と MEN の人口の差がトルコの人口とほぼ同じ（2015年：EUR +71、MEN −79、トルコ 78 百万人。2050年：+89、−95、96）なので、GCAM ではトルコが MEN ではなく EUR に入っていると判断した。CSV からトルコの分を取り出して直すことはできないので、EUR・MEN・AME のパネルでは GCAM を中央値の計算から外し、そのことを注釈に書いた。
+- 地域の定義はモデルによって少し違う可能性がある、と注釈に1行書いた。
 
 ## 処理の流れ
 
 ```
-data/Xiadata.xlsx（Crop prod change in 2050）
-data/モデル間比較用model_output/GLOBIOM.csv
-data/all_scenario_World.gdx（qs_load, cal_load, qdFood_load）
-define/xia_region_map.csv
- └─ prog/figXia_prod.py → output/figXia_prod_<作物>.png, figXia_prod_TOTAL.png, data/xia_prod_compare.csv, data/kcal_factor.csv
-
-data/モデル間比較用model_output/*.csv（XPRP, PROD）
-data/all_scenario_World.gdx（pp_load, qs_load）
- └─ prog/figXia_price.py → output/figXia_price_world.png, data/xia_price_compare.csv, data/xia_price_weights_info.csv
+data/モデル間比較用model_output/*.csv（PROD, CONS, XPRP）
+data/all_scenario_World.gdx（qs_load, qd_load, pp_load, cal_load, qdFood_load, pop_load, cty_reg_map）
+ └─ prog/figCSV_compare.py → output/figCSV_*.png（21枚）, data/csv_compare.csv, data/kcal_factor.csv, data/missing_cty.csv
 ```
 
 ## 実行方法
 
-`pip install gamspy_base "gamsapi[transfer]" pandas numpy matplotlib openpyxl` のあと、`figXia_prod.py` と `figXia_price.py` を実行する。どこから実行してもよい。
+`pip install gamspy_base "gamsapi[transfer]" pandas numpy matplotlib` のあと、`figCSV_compare.py` を実行する。どこから実行してもよい。
 
-## data・define の中身
+## 確認したこと
+
+- 次の値を、プログラムとは別のコードで計算し直し、一致を確かめた：
+  - IMPACT の世界の WHT の生産量の (2)
+  - GLOBIOM の SSA の RIC の価格の (4)
+  - AIM-Hub の世界の CRP の消費量の (3)
+  - AIM-ALPHA の SEA の OSD の生産量の (1)
+  - AIM-ALPHA の世界の CRP の価格の (2)
+- EUR の中央値が GCAM を除いて計算されていることを確かめた。
+- 生産量・消費量で (1)＋(2)＝(3) が成り立つことを確かめた（差は 1e-12 以下）。
+- 図を目で見て、注釈やラベルが切れたり重なったりしていないことを確かめた。
+
+## data・define・others の中身
 
 | フォルダ | ファイル | 内容 |
 |---|---|---|
-| data | `Xiadata.xlsx`, `all_scenario_World.gdx` | `OneTime/20261105/data/` と同じファイル |
-| data | `モデル間比較用model_output/` | 各モデルの AgMIP 形式の出力。`OneTime/20261104/data/` と同じファイル |
-| data | `xia_prod_compare.csv` | 生産量の図の数値（モデル × 地域 × 作物 × 効果）。d_1000t [1000 t]、PJ、AIM-ALPHA の中間報告の定義での値 |
-| data | `kcal_factor.csv` | カロリー換算係数 f [kcal/t] |
-| data | `xia_price_compare.csv` | 価格の図の数値（method_A）と照合用の値（method_B_csv, method_B_own）、AIM-ALPHA の中間報告の定義での値 [-] |
-| data | `xia_price_weights_info.csv` | 価格の計算に使った品目、地域×品目の組の数、WLD の生産量に対する割合 |
-| define | `xia_region_map.csv` | Xia SI Table 4 の国 → 地域（SI の PDF から作成。223か国・地域） |
-| define | `AgMIP_c.map` | AIM-ALPHA の品目 → AgMIP の品目。`OneTime/20261102/define/` からコピー |
-| define | `agec12086-sup-0001-appendix.xlsx` | von Lampe et al. (2014) の補足（作成者が置いた）。Fig.1–9 の図のデータで、品目の定義表（Table SI-4）は入っていなかった |
-| doc | `43016_2026_1322_MOESM1_ESM.pdf` | Xia et al. (2026) の SI。`OneTime/20261105/doc/` と同じファイル |
+| data | `all_scenario_World.gdx` | AIM-ALPHA の出力。`OneTime/20261105/data/` と同じファイル |
+| data | `モデル間比較用model_output/` | 5モデルの AgMIP 形式の出力 |
+| data | `csv_compare.csv` | 図の数値（Model, VAR, ITEM, Region, effect, value）。単位は PROD・CONS が PJ、XPRP が % |
+| data | `kcal_factor.csv` | カロリー換算係数 f |
+| data | `missing_cty.csv` | AIM-ALPHA で計算されていない国と、地域の人口に占める割合（2015年） |
+| data | `Xiadata.xlsx` | 今回は使っていない（Excel 版で使用） |
+| define | `AgMIP_c.map` | AIM-ALPHA の品目 → AgMIP の品目 |
+| define | `xia_region_map.csv` | Xia SI Table 4 の国 → 地域。今回は使っていない（Excel 版で使用） |
+| define | `agec12086-sup-0001-appendix.xlsx` | von Lampe et al. (2014) の補足。品目の定義表は入っていなかった |
+| doc | `43016_2026_1322_MOESM1_ESM.pdf` | Xia et al. (2026) の SI |
+| others | `excel_version/` | Excel を使った最初の版のプログラム・図・表 |
 
 - data・output は `.gitignore` で GitHub には上がらない。doc の PDF と define の appendix の xlsx は、出版物のファイルなので GitHub に上げていない。
-- `output/_t2.png` は、作業中に書き込みの確認で作った空のファイル（削除の権限が無いため残っている）。不要なので削除してよい。
+
+## 版の履歴（2026-11-06）
+
+1. Xia の Excel の値を使い、Xia の効果（Climate・Mitigation・Ozone）別に、生産量（重量）と農産物全体（AGR）の価格の図を作った。
+2. 卒論の4つの効果（Xia の効果の組み合わせ）、カロリーベース、中央値の棒に変えた。価格を作物だけ（CRP）にし、表記を AIM-ALPHA にそろえた。
+3. Excel の解像度と指標の制約を外すため、Excel をやめて CSV だけで作り直した（この版）。17地域、消費量、作物別の価格を追加し、卒論の定義どおりのシナリオの差で4つの効果を計算した。1. と 2. のプログラム・図・表は `others/excel_version/` にある（2. の版）。
