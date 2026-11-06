@@ -63,6 +63,9 @@ REG17 = ["CAN", "USA", "BRA", "OSA", "FSU", "EUR", "MEN", "SSA", "CHN", "IND", "
          "NAM", "OAM", "AME", "SAS"]
 BASE13 = REG17[:13]
 NO_GCAM_MEDIAN = ["EUR", "MEN", "AME"]
+# GLOBIOM の CSV には、メタン濃度を固定したオゾンのシナリオが無い（OZBAU などは中身がメタン濃度を変えた方）。
+# そのため、白抜きの記号で示し、中央値からは外す。
+HOLLOW = ["GLOBIOM"]
 ITEMS5 = ["WHT", "RIC", "CGR", "OSD", "SGC"]
 NAME = {"CRP": "Crops (CRP)", "WHT": "Wheat", "RIC": "Rice", "CGR": "Coarse grains", "OSD": "Oilseeds", "SGC": "Sugar crops"}
 # AgMIP の品目 → AIM-ALPHA の品目（define/AgMIP_c.map）
@@ -218,10 +221,12 @@ MISS_TEXT = ("† Countries not simulated in AIM-ALPHA (no data after 2015; excl
              + f";  World {miss.loc['WLD', 'share_pop2015']:.1f}%.  NAM, OAM, AME and SAS include the countries of their member regions.")
 COMMON_NOTES = [
     "Effects (scenario differences in 2050): (1) RCP26 - Baseline; (2) RCP26_MITI - RCP26; (3) RCP26_MITI - Baseline; (4) RCP70 - Baseline.  "
-    "Other models: Baseline = BAU_NoCC, RCP26 = OZBAU_RCP26, RCP26_MITI = OZBAU_MITI_RCP26, RCP70 = OZBAU (ozone without scenario-specific CH4 concentrations, "
-    "as in AIM-ALPHA; Xia et al.'s main results use the _W_CH4 scenarios).  "
+    "Other models: Baseline = BAU_NoCC, RCP26 = OZBAU_RCP26, RCP26_MITI = OZBAU_MITI_RCP26, RCP70 = OZBAU (ozone with fixed CH4 concentrations, "
+    "as in AIM-ALPHA; Xia et al.'s main results use scenario-specific CH4 concentrations, _W_CH4).  "
     "AIM-ALPHA: SSP2_BaU_CS_NoCC_woO3, SSP2_BaU_CS_RCP26_wO3, SSP2_500C_CS_RCP26_wO3, SSP2_BaU_CS_RCP70_wO3.  Ozone effects are included in the climate effects.",
-    "Bars: median of the five other models (AIM-Hub, ENVISAGE, GCAM, GLOBIOM, IMPACT), excluding AIM-ALPHA; for EUR, MEN and AME, GCAM is also excluded from the median.  "
+    "Bars: median of AIM-Hub, ENVISAGE, GCAM and IMPACT (AIM-ALPHA and GLOBIOM excluded); for EUR, MEN and AME, GCAM is also excluded from the median.  "
+    "GLOBIOM (hollow symbol) is shown for reference only: its output files contain only ozone scenarios with scenario-specific CH4 concentrations, "
+    "so its effects (especially (4)) are not consistent with the other models.  "
     "Source: AgMIP-format model output files (*.csv) and all_scenario_World.gdx (AIM-ALPHA).  AIM-Hub = 'AIM' in the model output files.",
     "CRP = WHT + RIC + CGR + OSD + SGC + VFN + OCR (primary crops; livestock, processed products, energy crops, fibre crops and other items excluded).  "
     "AIM-Hub has no VFN (included in its OCR).  AIM-ALPHA: 13 crops (CRP in define/AgMIP_c.map), aggregated by cty_reg_map.",
@@ -275,20 +280,25 @@ def save(fig, name):
 
 def panel(ax, d, region, small=False):
     xx = np.arange(len(EFFS))
-    med_models = [m for m in XIA if not (m == "GCAM" and region in NO_GCAM_MEDIAN)]
+    med_models = [m for m in XIA if m not in HOLLOW and not (m == "GCAM" and region in NO_GCAM_MEDIAN)]
     med = d[d.Model.isin(med_models)].groupby("effect").value.median().reindex(EFFS)
     ax.bar(xx, med.values, width=0.75, color="0.88", zorder=1)
     for m in MODELS:
         s = d[d.Model == m].set_index("effect").value.reindex(EFFS)
-        ax.scatter(xx + OFF[m], s.values, marker=MARK[m], s=6 if small else 10, color=COLR[m], linewidths=0, zorder=3)
+        if m in HOLLOW:
+            ax.scatter(xx + OFF[m], s.values, marker=MARK[m], s=7 if small else 12, facecolors="none",
+                       edgecolors=COLR[m], linewidths=0.5, zorder=3)
+        else:
+            ax.scatter(xx + OFF[m], s.values, marker=MARK[m], s=6 if small else 10, color=COLR[m], linewidths=0, zorder=3)
     ax.axhline(0, color="black", lw=0.4, zorder=2)
     ax.set_xticks(xx); ax.set_xticklabels(EFFS, fontsize=5.5 if small else 6.5)
     ax.set_xlim(-0.6, len(xx) - 0.4)
     ax.tick_params(axis="y", labelsize=5.5 if small else 6)
 
 def legend(fig, y):
-    h = [Line2D([], [], ls="", marker=MARK[m], color=COLR[m], ms=3.5, label=LABEL.get(m, m)) for m in MODELS]
-    h.append(Patch(color="0.88", label="Median of the other models (excl. AIM-ALPHA)"))
+    h = [Line2D([], [], ls="", marker=MARK[m], color=COLR[m], ms=3.5, label=LABEL.get(m, m) + (" (not in median)" if m in HOLLOW else ""),
+                markerfacecolor="none" if m in HOLLOW else COLR[m], markeredgewidth=0.5 if m in HOLLOW else 0) for m in MODELS]
+    h.append(Patch(color="0.88", label="Median (excl. AIM-ALPHA, GLOBIOM)"))
     fig.legend(handles=h, loc="upper center", bbox_to_anchor=(0.5, y), ncol=7, frameon=False,
                fontsize=6, handletextpad=0.2, columnspacing=0.7)
 
