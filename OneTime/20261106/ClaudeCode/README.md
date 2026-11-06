@@ -35,15 +35,16 @@ Xia et al. (2026) の Excel（`Xiadata.xlsx`）は使っていない。Excel を
 |---|---|---|
 | Baseline | BAU_NoCC | SSP2_BaU_CS_NoCC_woO3 |
 | RCP26 | OZBAU_RCP26 | SSP2_BaU_CS_RCP26_wO3 |
-| RCP26_MITI | OZBAU_MITI_RCP26_W_CH4 | SSP2_500C_CS_RCP26_wO3 |
-| RCP70 | OZBAU_W_CH4 | SSP2_BaU_CS_RCP70_wO3 |
+| RCP26_MITI | OZBAU_MITI_RCP26 | SSP2_500C_CS_RCP26_wO3 |
+| RCP70 | OZBAU | SSP2_BaU_CS_RCP70_wO3 |
 
 - オゾンの影響は気候の影響に含める（卒論の設計）。
-- **`_W_CH4`**：オゾン濃度を、シナリオごとの CH4（メタン）濃度で計算したもの（Xia et al. 本文 Methods）。Xia の主な結果はこちら。
-  - **AIM-ALPHA の wO3 は CH4 濃度を変えていると判断して**、RCP26_MITI と RCP70 は `_W_CH4` を使った（作成者の判断。確認中）。
-  - RCP26（緩和なし・RCP2.6）の `_W_CH4` は AIM-Hub にしか無いので、全モデルで CH4 なしの OZBAU_RCP26 を使った。RCP2.6 では CH4 の有無による差は小さい（作物全体の世界の生産量へのオゾン効果で 0.02–0.17 ポイント）。
-  - GLOBIOM には `_W_CH4` が無いので、すべて CH4 なし。ENVISAGE は小文字の `_w_CH4`。
-  - 作成者の確認の結果、AIM-ALPHA が CH4 濃度を変えていなかった場合は作り直す。
+- **`_W_CH4`**：オゾン濃度を、シナリオごとの CH4（メタン）濃度で計算したもの（Xia et al. 本文 Methods）。Xia の主な結果（Excel の値）はこちら。
+- **全モデルで `_W_CH4` なしのシナリオを使った。** AIM-ALPHA の wO3 のオゾンが、`_W_CH4` なしと同じだったため。
+  - 確かめ方：AIM-ALPHA の外生収量（`OneTime/20261102/data/AGMIP_all_scenario.gdx` の AGMIP_agg の YEXO、2050年）で、wO3 ÷ woO3 − 1（オゾンの影響）を地域・作物ごとに計算し、各モデルの CSV の YEXO（OZBAU ÷ BAU − 1 など）と比べた。
+  - RCP7.0 では、`_W_CH4` なしとの相関が 0.79–0.90、`_W_CH4` ありとの相関が −0.08 〜 −0.28 だった。CAN, USA, BRA, IND の小麦は、`_W_CH4` なしと小数第2位まで一致した（例：USA +10.85%）。
+  - AIM-ALPHA は GHG としてのメタンの排出は計算しているが、収量へのオゾンの入力は CH4 濃度をシナリオで変えていないものと判断した。
+  - 最初は `_W_CH4` を使って作ったが、この確認の後に作り直した。
 
 ## 3. 指標
 
@@ -104,7 +105,7 @@ f [kcal/t] = Σ cal_load [million kcal] ÷ Σ qdFood_load [1000 t] × 1000
 
   - 集計地域（OAM, AME, SAS）は、メンバーの地域の欠損を含む。17地域の図では、該当する地域のパネルのタイトルに † を付けた。
   - BHR, QAT, BTN は、計算されているが農地と生産が無い国なので、欠損として扱っていない。作物ごとの値が無い組も、生産が無いとみなした。
-- **台湾**：AIM-ALPHA に台湾の値は無い。台湾の生産は CHN に含まれる（IMPACT の地域 CHM = 中国本土＋台湾。`impact_cty.map` で CHM → CHN）。この点は作成者が確認中で、違った場合は作り直す。
+- **台湾**：AIM-ALPHA には台湾が含まれていない（人口・GDP の将来推計が無いため。作成者が確認）。他のモデルは台湾を SEA に含めている。
 - **GCAM のトルコ**：GCAM の EUR と MEN の人口の差がトルコの人口とほぼ同じ（2015年：EUR +71、MEN −79、トルコ 78 百万人。2050年：+89、−95、96）なので、GCAM ではトルコが MEN ではなく EUR に入っていると判断した。CSV からトルコの分を取り出して直すことはできないので、EUR・MEN・AME のパネルでは GCAM を中央値の計算から外し、そのことを注釈に書いた。
 - 地域の定義はモデルによって少し違う可能性がある、と注釈に1行書いた。
 
@@ -131,6 +132,7 @@ data/all_scenario_World.gdx（qs_load, qd_load, pp_load, cal_load, qdFood_load, 
 - EUR の中央値が GCAM を除いて計算されていることを確かめた。
 - 生産量・消費量で (1)＋(2)＝(3) が成り立つことを確かめた（差は 1e-12 以下）。
 - 図を目で見て、注釈やラベルが切れたり重なったりしていないことを確かめた。
+- **気になる点（未対応）：** AIM-ALPHA の外生収量（AGMIP_agg の YEXO、2050年）では、CHN のオゾンの影響が全作物で 0.00% だった（他の地域は 0.7–10% 程度）。CHN の小麦は、気候の影響（RCP70 woO3 ÷ NoCC woO3）も 0.00% だった。入力（ClimateShifters2）の中国（CHM）の値の扱いを確かめる必要がある。
 
 ## data・define・others の中身
 

@@ -226,7 +226,7 @@ COMMON_NOTES = [
     "CRP = WHT + RIC + CGR + OSD + SGC + VFN + OCR (primary crops; livestock, processed products, energy crops, fibre crops and other items excluded).  "
     "AIM-Hub has no VFN (included in its OCR).  AIM-ALPHA: 13 crops (CRP in define/AgMIP_c.map), aggregated by cty_reg_map.",
     MISS_TEXT,
-    "Taiwan is not included in AIM-ALPHA (no population and GDP projections); the other models include it in SEA.",
+    "Taiwan is not included in AIM-ALPHA (no population and GDP projections).",
     "GCAM: Turkey is included in EUR instead of MEN (inferred from its population by region).  Regional definitions may differ slightly among models (e.g., GCAM: EUR/MEN).",
 ]
 VAR_NOTES = {
